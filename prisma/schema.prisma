@@ -9,3 +9,38 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  credits   Int      @default(3)
+  isPremium Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+model Conversation {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  messages  Message[]
+}
+model App {
+  id String @id @default(uuid())
+  name String
+  description String
+  icon String
+  
+  conversationId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Message {
+  id String @id @default(uuid())
+  conversationId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  role String
+  content String
+  conversation Conversation @relation(fields: [conversationId],references:[id])
+}
