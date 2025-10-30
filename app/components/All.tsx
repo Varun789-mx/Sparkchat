@@ -1,12 +1,12 @@
 "use client"
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Plus, Menu, Sparkles, User, Bot, ChevronDown, Sun, Moon } from 'lucide-react';
+import { Send, Plus, Menu, Sparkles, User, Bot, ChevronDown, Sun, Moon, LoaderCircle } from 'lucide-react';
 import { sendMessage } from '../actions/chat';
 
 export default function AIChatbot() {
     const [messages, setMessages] = useState([
         {
-            id: 1,
+            id : 1,
             type: 'bot',
             content: 'Hello! I\'m your AI assistant. How can I help you today?',
             timestamp: new Date()
@@ -16,6 +16,7 @@ export default function AIChatbot() {
     const [isTyping, setIsTyping] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(true);
     const messagesEndRef = useRef(null);
+    // const [Conversation,setconversation]
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -28,7 +29,7 @@ export default function AIChatbot() {
     const handleSend = async () => {
         if (!input.trim()) return;
         const userMessage = {
-            id: messages.length + 1,
+            id: messages.length + 1 ,
             type: 'user',
             content: input,
             timestamp: new Date()
@@ -43,7 +44,7 @@ export default function AIChatbot() {
             if (response?.success) {
 
                 const botMessage = {
-                    id: messages.length + 2,
+                    id : 1,
                     type: 'bot',
                     content: response?.message,
                     timestamp: new Date()
@@ -160,7 +161,7 @@ export default function AIChatbot() {
                             <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
                                 <Sparkles className="w-4 h-4 text-white" />
                             </div>
-                            <h1 className={`${theme.text} font-semibold`}>ChatGPT 4o</h1>
+                            <h1 className={`${theme.text} font-semibold`}>SparkAi 4o</h1>
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -253,15 +254,15 @@ export default function AIChatbot() {
 
                 {/* Input Area */}
                 <div className={`border-t ${theme.headerBorder} ${theme.header} p-4`}>
-                    <div className="max-w-3xl mx-auto">
-                        <div className="relative">
+                    <div className="max-w-3xl mx-auto ">
+                        <div className="relative ">
                             <textarea
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
                                 onKeyUp={handleKeyPress}
-                                placeholder="Message ChatGPT..."
+                                placeholder="Message SparkAi..."
                                 rows={1}
-                                className={`w-full ${theme.inputBg} border ${theme.inputBorder} ${theme.inputFocus} rounded-xl px-4 py-3 pr-12 ${theme.text} placeholder-gray-500 focus:outline-none resize-none transition-colors`}
+                                className={`w-full ${theme.inputBg} border field-sizing-content ${theme.inputBorder} ${theme.inputFocus} overflow-y-scroll scrollbar-hide [scrollbar-width:none] [&::-webkit-scrollbar]:hidden resize-none h-full  rounded-xl px-4 py-3 pr-12 ${theme.text} placeholder-gray-500 focus:outline-none resize-none transition-colors`}
                                 style={{ minHeight: '52px', maxHeight: '200px' }}
                             />
                             <button
@@ -271,12 +272,13 @@ export default function AIChatbot() {
                                     ? 'bg-blue-600 hover:bg-blue-700'
                                     : `${theme.inputBg} cursor-not-allowed`
                                     }`}
+                            
                             >
-                                <Send className={`w-4 h-4 ${input.trim() ? 'text-white' : 'text-gray-500'}`} />
+                                <Send className={`w-4 h-4 items-center ${input.trim() ? 'text-white' : 'text-gray-500'}`} />
                             </button>
                         </div>
                         <p className={`text-center ${theme.textMuted} text-xs mt-2`}>
-                            ChatGPT can make mistakes. Check important info.
+                            SparkAi can make mistakes. Check important info.
                         </p>
                     </div>
                 </div>
