@@ -1,14 +1,10 @@
-import { NextauthOptions } from "next-auth";
+import { NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import { Prisma } from "@prisma/client";
-import Usermodel from "@/lib/UserModel";
+import { PrismaClient } from '@prisma/client'
 
-
-
-
-
-export const authOptions: NextauthOptions = {
+const prisma = new PrismaClient()
+export const authOptions: NextAuthConfig = {
   providers: [
     CredentialsProvider({
       id: "credentials",
@@ -21,15 +17,48 @@ export const authOptions: NextauthOptions = {
         },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials:any):Promise<any> { 
-        const password = credentials.password;
-        const VerifyPass = await bcrypt.compare(credentials.password,Prisma.UserScalarFieldEnum.password);
-try {
-          }catch(error:any) { 
-            throw new Error(error)
-          } 
-        
+      async authorize(credentials: any) {
+        try {
+          const User = await prisma.user.findUnique({
+            where: {
+              email: credentials.email,
+            }
+          })
+          if (!User) {
+            throw new Error("User Doesn't exist,Please Login")
+          }
+          const VerifyPass = await bcrypt.compare(credentials.password, User.password);
+          if (!VerifyPass) {
+            throw new Error("Invalid Credentials")
+          }
+          return User;
+        }
+        catch (error: any) {
+          throw new Error(error.message || "Authentication Failed");
+        }
       }
     }),
   ],
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id?.toString();
+        token.email = user.email;
+        token.username = user.username;
+      }
+      return token
+    },
+    async session({ session, token }) {
+      if (token) {
+        session.user.id = token.id;
+        session.user.email = token.email;
+        session.user.username = token.username;
+      }
+      return session
+    }
+  },
+  session: {
+    strategy: "jwt"
+  },
+  secret: process.env.NEXT_AUTH_SECRET,
 };
