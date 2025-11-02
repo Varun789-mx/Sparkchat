@@ -1,114 +1,287 @@
-"use client"
-import { Eye, EyeOff } from "lucide-react";
-import { useState } from "react"
+"use client";
 
-export default function Signup() {
+import { AlertCircle, CheckCircle, Eye, EyeOff } from "lucide-react";
+import { ChangeEvent, FormEvent, useState } from "react";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { signUpUser } from "@/app/actions/auth";
+
+export default function SignUpPage() {
+    const router = useRouter();
     const [formData, setFormData] = useState({
         username: "",
         email: "",
         password: "",
-        confirmpassword: "",
+        confirmPassword: "",
     });
-    const [showPassword, setshowPassword] = useState(false);
-    const [loading, setloading] = useState(false);
-    
-    const Handlerform = (e: any) => {
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState(false);
+
+    const handleFormData = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setFormData(prevdata => ({
-            ...prevdata,
+        setFormData((prevData) => ({
+            ...prevData,
             [name]: value,
-        }))
-    }
+        }));
+        setError("");
+    };
+
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setError("");
+        setSuccess(false);
+        setLoading(true);
+
+        try {
+            console.log("🚀 Starting signup process...");
+
+            // Call the signUpUser server action from auth.ts
+            const result = await signUpUser(formData);
+
+            console.log("📝 Signup result:", result);
+
+            if (!result.success) {
+                setError(result.error || "Something went wrong");
+                setLoading(false);
+                return;
+            }
+
+            // Show success message
+            setSuccess(true);
+            console.log("✅ User created successfully!");
+
+            // Wait 1 second to show success message
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+
+            console.log("🔐 Auto-signing in...");
+
+            // Auto sign in after successful signup
+            const signInResult = await signIn("credentials", {
+                email: formData.email,
+                password: formData.password,
+                redirect: false,
+            });
+
+            if (signInResult?.error) {
+                setError("Account created but failed to sign in. Please sign in manually.");
+                setLoading(false);
+                // Redirect to signin page after 2 seconds
+                setTimeout(() => {
+                    router.push("/signin");
+                }, 2000);
+                return;
+            }
+
+            if (signInResult?.ok) {
+                console.log("✅ Auto sign-in successful! Redirecting...");
+                router.push("/chat");
+                router.refresh();
+            }
+        } catch (err: any) {
+            console.error("❌ Signup error:", err);
+            setError(err.message || "Something went wrong. Please try again.");
+            setLoading(false);
+        }
+    };
 
     return (
-        <div className="w-full h-screen flex">
-            {/* Form Box */}
-            <div className="flex w-3/5 items-center justify-center bg-gray-900 space-y-2.5">
+        <div className="relative flex items-center justify-center min-h-screen bg-gray-900 overflow-hidden">
+            <div className="flex md:w-4/5 w-full items-center justify-center bg-gray-900">
                 {/* Main Form */}
-                <div className="min-w-sm flex flex-col justify-center">
-                    <div className="text-2xl font-bold items-end">
-                        Sign in to your account
-                        <p className="text-sm font-light text-blue-500">Dream do come true</p>
-                    </div>
-
-                    <br />
-
-                    <div className="w-full">
-                        <label 
-                            className="text-sm font-bold focus-within:ring-2 focus-within:ring-blue-900 focus-within:border-blue-500" 
-                            htmlFor="email"
-                        >
-                            Email
-                        </label>
-                        <input 
-                            type="text" 
-                            id="email" 
-                            name="email" 
-                            className="bg-gray-700  border-0 text-white text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:placeholder-gray-400 dark:text-white focus:outline-none focus:ring-0" 
-                            onChange={Handlerform} 
-                            value={formData.email} 
-                        />
-                    </div>
-
-                    <br />
-
-                    <div className="w-full">
-                        <label 
-                            className="text-sm font-bold" 
-                            htmlFor="password"
-                        >
-                            Password
-                        </label>
-                        <input 
-                            type="text" 
-                            id="password" 
-                            name="password" 
-                            className="bg-gray-700  border-0 text-white text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:placeholder-gray-400 dark:text-white focus:outline-none focus:ring-0" 
-                            onChange={Handlerform} 
-                            value={formData.password} 
-                        />
-                        <button type="button" onClick={()=>setshowPassword(!showPassword)} className="ocus:outline-none dark:text-gray-300 px-2">
-                        {showPassword?<Eye/>:<EyeOff/>}
-                        </button> 
-                    </div>
-
-                    <br />
-
-                    <div className="flex justify-between p-2">
-                        <div className="flex items-center text-sm gap-2 text-gray-200">
-                            <input 
-                                value={formData.password} 
-                                id="password" 
-                                name="password" 
-                                type="checkbox" 
-                                className="accent-blue-500" 
-                            />
-                            <span>Remember me</span>
+                <div className="w-full max-w-md p-8 flex flex-col justify-center">
+                    <form onSubmit={handleSubmit}>
+                        <div className="text-2xl font-bold text-white">
+                            Create your account
+                            <p className="text-sm font-light text-blue-500 mt-1">
+                                Dreams do come true
+                            </p>
                         </div>
-                        <span className="text-blue-500 cursor-pointer hover:underline">
-                            Forget Password
-                        </span>
-                    </div>
 
-                    <div className="flex text-sm justify-center p-2 font-bold rounded-lg bg-blue-500 hover:bg-blue-600 focus-within:bg-blue-600">
-                        <button 
-                            type="button" 
-                            className="hover:bg-blue-600 focus-within:bg-blue-600"
-                        >
-                            Sign in
-                        </button>
-                    </div>
+                        {/* Error Alert */}
+                        {error && (
+                            <div className="mt-4 p-3 bg-red-900/50 border border-red-500 rounded-lg flex items-start gap-2">
+                                <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                                <p className="text-sm text-red-200">{error}</p>
+                            </div>
+                        )}
+
+                        {/* Success Alert */}
+                        {success && (
+                            <div className="mt-4 p-3 bg-green-900/50 border border-green-500 rounded-lg flex items-start gap-2 animate-pulse">
+                                <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                                <p className="text-sm text-green-200">
+                                    Account created successfully! Signing you in...
+                                </p>
+                            </div>
+                        )}
+
+                        <div className="mt-6 space-y-4">
+                            {/* Username Field */}
+                            <div className="w-full">
+                                <label
+                                    className="text-sm font-bold text-white block mb-2"
+                                    htmlFor="username"
+                                >
+                                    Username
+                                </label>
+                                <input
+                                    type="text"
+                                    id="username"
+                                    name="username"
+                                    className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg block w-full p-2.5 placeholder-gray-400 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all duration-100"
+                                    onChange={handleFormData}
+                                    disabled={loading || success}
+                                    value={formData.username}
+                                    placeholder="johndoe"
+                                    required
+                                />
+                                <p className="text-xs text-gray-400 mt-1">
+                                    At least 3 characters
+                                </p>
+                            </div>
+
+                            {/* Email Field */}
+                            <div className="w-full">
+                                <label
+                                    className="text-sm font-bold text-white block mb-2"
+                                    htmlFor="email"
+                                >
+                                    Email
+                                </label>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg block w-full p-2.5 placeholder-gray-400 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all duration-100"
+                                    onChange={handleFormData}
+                                    disabled={loading || success}
+                                    value={formData.email}
+                                    placeholder="johndoe@example.com"
+                                    required
+                                />
+                            </div>
+
+                            {/* Password Field */}
+                            <div className="w-full">
+                                <label
+                                    className="text-sm font-bold text-white block mb-2"
+                                    htmlFor="password"
+                                >
+                                    Password
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        type={showPassword ? "text" : "password"}
+                                        id="password"
+                                        name="password"
+                                        className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg block w-full p-2.5 pr-10 placeholder-gray-400 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all duration-100"
+                                        onChange={handleFormData}
+                                        disabled={loading || success}
+                                        value={formData.password}
+                                        placeholder="••••••••"
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white focus:outline-none"
+                                        aria-label={showPassword ? "Hide password" : "Show password"}
+                                        disabled={loading || success}
+                                    >
+                                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                    </button>
+                                </div>
+                                <p className="text-xs text-gray-400 mt-1">
+                                    At least 6 characters
+                                </p>
+                            </div>
+
+                            {/* Confirm Password Field */}
+                            <div className="w-full">
+                                <label
+                                    className="text-sm font-bold text-white block mb-2"
+                                    htmlFor="confirmPassword"
+                                >
+                                    Confirm Password
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        type={showConfirmPassword ? "text" : "password"}
+                                        id="confirmPassword"
+                                        name="confirmPassword"
+                                        className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg block w-full p-2.5 pr-10 placeholder-gray-400 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all duration-100"
+                                        onChange={handleFormData}
+                                        disabled={loading || success}
+                                        value={formData.confirmPassword}
+                                        placeholder="••••••••"
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white focus:outline-none"
+                                        aria-label={
+                                            showConfirmPassword ? "Hide password" : "Show password"
+                                        }
+                                        disabled={loading || success}
+                                    >
+                                        {showConfirmPassword ? (
+                                            <EyeOff size={20} />
+                                        ) : (
+                                            <Eye size={20} />
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Submit Button */}
+                            <button
+                                type="submit"
+                                disabled={loading || success}
+                                className="w-full text-sm disabled:bg-slate-500 disabled:cursor-not-allowed justify-center p-2.5 font-bold rounded-lg bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-800 transition-colors mt-6"
+                            >
+                                {loading
+                                    ? "Creating account..."
+                                    : success
+                                        ? "Success! Redirecting..."
+                                        : "Create Account"}
+                            </button>
+                        </div>
+
+                        {/* Divider */}
+                        <div className="flex items-center my-6">
+                            <div className="grow border-t border-gray-600"></div>
+                            <span className="mx-2 text-gray-400 text-sm">
+                                or sign up with
+                            </span>
+                            <div className="grow border-t border-gray-600"></div>
+                        </div>
+
+                        {/* Sign In Link */}
+                        <div className="text-center text-sm text-gray-400">
+                            Already have an account?{" "}
+                            <a
+                                href="/signin"
+                                className="text-blue-500 hover:underline font-medium"
+                            >
+                                Sign in
+                            </a>
+                        </div>
+                    </form>
                 </div>
             </div>
 
             {/* Image Section */}
-            <div className="h-screen">
-                <img 
-                    className="w-full h-screen" 
-                    src="https://images.unsplash.com/photo-1496917756835-20cb06e75b4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1908&q=80" 
+            <div className="hidden md:block md:w-1/2">
+                <img
+                    className="w-full h-screen object-cover"
+                    src="https://images.unsplash.com/photo-1496917756835-20cb06e75b4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1908&q=80"
                     alt="Background"
                 />
             </div>
         </div>
-    )
+    );
 }
