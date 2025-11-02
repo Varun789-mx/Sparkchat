@@ -43,6 +43,7 @@ const Handlerform = async (e: FormEvent<HTMLFormElement>) => {
             email: formData.email,
             password: formData.password,
             redirect: false,
+            callbackUrl:"/chat"
         })
         if (signinResult?.error) {
             seterrors(signinResult.error);

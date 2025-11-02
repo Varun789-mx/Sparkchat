@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Plus, Menu, Sparkles, User, Bot, ChevronDown, Sun, Moon, LoaderCircle } from 'lucide-react';
 import { sendMessage } from '../actions/chat';
+import { signOut } from 'next-auth/react';
 
 export default function AIChatbot() {
     const [messages, setMessages] = useState([
@@ -78,6 +79,9 @@ export default function AIChatbot() {
         "Help me debug code",
         "Plan a travel itinerary"
     ];
+    const handlesignout = async()=>{ 
+        await signOut();
+    }
 
     // Theme classes
     const theme = {
@@ -108,6 +112,7 @@ export default function AIChatbot() {
             {/* Sidebar */}
             <div className={`w-72 ${theme.sidebar} border-r ${theme.sidebarBorder} flex flex-col`}>
                 {/* Sidebar Header */}
+                <button className='bg-blue-500 rounded-lg font-bold p-2' type='button' onClick={handlesignout}>Log out</button>
                 <div className={`p-4 border-b ${theme.sidebarBorder}`}>
                     <button className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-gray-700 hover:bg-gray-800 transition-colors text-white font-medium">
                         <Plus className="w-4 h-4" />
