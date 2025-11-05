@@ -1,15 +1,16 @@
 "use client"
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Plus, Menu, Sparkles, User, Bot, ChevronDown, Sun, Moon, LoaderCircle } from 'lucide-react';
-import { sendMessage } from '../actions/chat';
+import { sendMessage, GetModelResponse } from '../actions/chat';
 import { signOut } from 'next-auth/react';
+
 
 export default function AIChatbot() {
     const [messages, setMessages] = useState([
         {
-            id : 1,
+            id: 1,
             type: 'bot',
-            content: 'Hello! I\'m your AI assistant. How can I help you today?',
+            CONTENT: 'Hello! I\'m your AI assistant. How can I help you today?',
             timestamp: new Date()
         }
     ]);
@@ -26,45 +27,55 @@ export default function AIChatbot() {
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
-
     const handleSend = async () => {
         if (!input.trim()) return;
+
         const userMessage = {
-            id: messages.length + 1 ,
+            id: Date.now(), // Better unique ID
             type: 'user',
-            content: input,
-            timestamp: new Date()
+            CONTENT: input,
+            MODEL: 'gemini-2.5-flash',
+            timestamp: new Date(),
         };
 
         setMessages([...messages, userMessage]);
         setInput('');
         setIsTyping(true);
-        try {
-            const response = await sendMessage(input);
-            console.log(response?.message);
-            if (response?.success) {
 
-                const botMessage = {
-                    id : 1,
-                    type: 'bot',
-                    content: response?.message,
-                    timestamp: new Date()
-                };
-                setMessages(prev => [...prev, botMessage]);
-                setIsTyping(false);
+        try {
+            const response = await GetModelResponse({
+                MODEL: userMessage.MODEL,
+                PROMPT: userMessage.CONTENT,
+            });
+
+            console.log(response, "From all");
+
+            if (!response.success) {
+                throw new Error("Unable to get response");
             }
-        } catch (error) {
+            if (response.response.ok) {
+                const Botmessage = {
+                    id: Date.now(),
+                    type: 'bot',
+                    CONTENT: response.response,
+                    timestamp: new Date(),
+                }
+                  setMessages(prev => [...prev, Botmessage]);
+                  setIsTyping(false);
+            }
+        } catch (error: any) {
             console.log(error);
-            const botMessage = {
-                id: messages.length + 2,
+
+            setMessages(prev => [...prev, {
+                id: Date.now(),
                 type: 'bot',
-                content: `${error}`,
+                CONTENT: error.message || 'An error occurred',
                 timestamp: new Date()
-            };
+            }]);
+
             setIsTyping(false);
-            setMessages(prev => [...prev, botMessage])
-        };
-    }
+        }
+    };
 
     const handleKeyPress = (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -79,7 +90,7 @@ export default function AIChatbot() {
         "Help me debug code",
         "Plan a travel itinerary"
     ];
-    const handlesignout = async()=>{ 
+    const handlesignout = async () => {
         await signOut();
     }
 
@@ -226,7 +237,7 @@ export default function AIChatbot() {
                                             : `${theme.botMessageBg} ${theme.text}`
                                             }`}
                                     >
-                                        <p className="leading-relaxed text-sm">{message.content}</p>
+                                        <p className="leading-relaxed text-sm">{message.CONTENT}</p>
                                     </div>
                                 </div>
 
@@ -267,7 +278,7 @@ export default function AIChatbot() {
                                 onKeyUp={handleKeyPress}
                                 placeholder="Message SparkAi..."
                                 rows={1}
-                                className={`w-full ${theme.inputBg} border field-sizing-content ${theme.inputBorder} ${theme.inputFocus} overflow-y-scroll scrollbar-hide [scrollbar-width:none] [&::-webkit-scrollbar]:hidden resize-none h-full  rounded-xl px-4 py-3 pr-12 ${theme.text} placeholder-gray-500 focus:outline-none resize-none transition-colors`}
+                                className={`w-full ${theme.inputBg} border field-sizing-CONTENT ${theme.inputBorder} ${theme.inputFocus} overflow-y-scroll scrollbar-hide [scrollbar-width:none] [&::-webkit-scrollbar]:hidden resize-none h-full  rounded-xl px-4 py-3 pr-12 ${theme.text} placeholder-gray-500 focus:outline-none resize-none transition-colors`}
                                 style={{ minHeight: '52px', maxHeight: '200px' }}
                             />
                             <button
@@ -277,7 +288,7 @@ export default function AIChatbot() {
                                     ? 'bg-blue-600 hover:bg-blue-700'
                                     : `${theme.inputBg} cursor-not-allowed`
                                     }`}
-                            
+
                             >
                                 <Send className={`w-4 h-4 items-center ${input.trim() ? 'text-white' : 'text-gray-500'}`} />
                             </button>
