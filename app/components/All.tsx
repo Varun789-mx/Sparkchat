@@ -34,7 +34,7 @@ export default function AIChatbot() {
             id: Date.now(), // Better unique ID
             type: 'user',
             CONTENT: input,
-            MODEL: 'gemini-2.5-flash',
+            MODEL: 'gpt-3.5-turbo',
             timestamp: new Date(),
         };
 
@@ -53,11 +53,11 @@ export default function AIChatbot() {
             if (!response.success) {
                 throw new Error("Unable to get response");
             }
-            if (response.response.ok) {
+            if (response.response) {
                 const Botmessage = {
                     id: Date.now(),
                     type: 'bot',
-                    CONTENT: response.response,
+                    CONTENT: response.response.choices[0].message.content,
                     timestamp: new Date(),
                 }
                   setMessages(prev => [...prev, Botmessage]);

@@ -3,9 +3,11 @@ import { Eye, EyeOff } from "lucide-react";
 import { ChangeEvent, FormEvent, FormEventHandler, useState } from "react"
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+
+
 export default function Signup() {
-const router = useRouter();
-const [formData, setFormData] = useState({
+    const router = useRouter();
+    const [formData, setFormData] = useState({
     email: "",
     password: "",
 });

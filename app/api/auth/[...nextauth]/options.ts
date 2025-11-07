@@ -26,6 +26,7 @@ export const authOptions: NextAuthOptions = {
           })
           if (!User) {
             throw new Error("User Doesn't exist,Please Login")
+            return null;
           }
           const VerifyPass = await bcrypt.compare(credentials.password, User.password);
           if (!VerifyPass) {
@@ -35,6 +36,7 @@ export const authOptions: NextAuthOptions = {
         }
         catch (error: any) {
           throw new Error(error.message || "Authentication Failed");
+          return null;
         }
       }
     }),
@@ -45,6 +47,7 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id?.toString();
         token.email = user.email;
         token.username = user.username;
+
       }
       return token
     },
@@ -64,4 +67,5 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt"
   },
   secret: process.env.NEXTAUTH_SECRET,
+  debug:true
 };

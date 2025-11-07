@@ -12,7 +12,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/chat', request.url))
   }
   else if (!token && !isAuthPage) {
-    return NextResponse.redirect(new URL('/api/auth/signin', request.url));
+    return NextResponse.redirect(new URL('/signin', request.url));
   }
   return NextResponse.next();
 }
