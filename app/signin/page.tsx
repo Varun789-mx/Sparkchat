@@ -1,5 +1,5 @@
 "use client"
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff,CheckCircle } from "lucide-react";
 import { ChangeEvent, FormEvent, FormEventHandler, useState } from "react"
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 
 export default function Signup() {
     const router = useRouter();
+    const [success,setsuccess]  = useState(true);
     const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -50,7 +51,11 @@ const Handlerform = async (e: FormEvent<HTMLFormElement>) => {
         if (signinResult?.error) {
             seterrors(signinResult.error);
             setloading(false);
+            setsuccess(true);
             return;
+        }
+        if(signinResult?.status == 401) {
+            setsuccess(false);
         }
         if (signinResult?.ok) {
             router.push("/chat");
@@ -65,10 +70,21 @@ const Handlerform = async (e: FormEvent<HTMLFormElement>) => {
 
 return (
     <div className="relative flex items-center justify-center min-h-screen bg-gray-900 overflow-hidden ">
+       
         {/* Form Box */}
-        <div className="flex  md:w-4/5 items-center  justify-center bg-gray-900 space-y-2.5">
+       
             {/* Main Form */}
+             <div className="flex  md:w-4/5 items-center  justify-center bg-gray-900 space-y-2.5">
             <div className="min-w-sm   flex flex-col justify-center lg:w">
+                <div className="w-full justify-center align-top"> {success && (
+                            <div className="mt-4 p-3 bg-green-900/50 border border-green-500 rounded-lg flex items-start gap-2 animate-pulse">
+                                <CheckCircle className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
+                                <p className="text-sm text-green-200">
+                                     Signing you in...
+                                </p>
+                            </div>
+                        )}
+      </div>
                 <form onSubmit={Handlerform}>
                     <div className="text-2xl font-bold items-end">
                         Sign in to your account
@@ -146,6 +162,15 @@ return (
                         <span className="mx-2 text-gray-400 text-sm">or Sign in with</span>
                         <div className="grow border-t border-gray-500"></div>
                     </div>
+                    <div className="text-center text-sm text-gray-400">
+                            Don't have an account?{" "}
+                            <a
+                                href="/signup"
+                                className="text-blue-500 hover:underline font-medium"
+                            >
+                                Sign up
+                            </a>
+                        </div>
                 </form>
             </div>
         </div>
