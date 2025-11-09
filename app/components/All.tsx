@@ -15,7 +15,7 @@ export default function AIChatbot({ conversationId: initialConversationId }: Cha
         {
             id: 1,
             type: 'bot',
-            CONTENT: 'Hello! I\'m your AI assistant. How can I help you today?',
+            message: 'Hello! I\'m your AI assistant. How can I help you today?',
             timestamp: new Date()
         }
     ]);
@@ -40,7 +40,7 @@ export default function AIChatbot({ conversationId: initialConversationId }: Cha
         const userMessage = {
             id: Date.now(), // Better unique ID
             type: 'user',
-            CONTENT: input,
+            message: input,
             MODEL: 'gpt-3.5-turbo',
             timestamp: new Date(),
         };
@@ -49,17 +49,27 @@ export default function AIChatbot({ conversationId: initialConversationId }: Cha
         setInput('');
         setIsTyping(true);
 
+
         try {
-            const response = await axios.get('http://localhost:3000/chat', {
-                params: {
-                    conversationId: conversationId,
-                    MODEL: userMessage.MODEL,
-                    PROMPT: userMessage.CONTENT,
-                }
+            const params = new URLSearchParams({
+                conversationId:conversationId,
+                MODEL:MODEL,
+                message:message
+            })
+            const response = await fetch(`http://localhost:3000/chat?${params}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'text/event-stream',
+                },
             });
 
             console.log(response, "From all");
-
+            const reader = response.body?.pipeThrough(new TextDecoderStream()).getReader()
+            while (true) {
+                const { value, done } = await reader?.read()
+                if (done) break;
+                setMessages((prev) => prev + value);
+            }
             if (!response.success) {
                 throw new Error("Unable to get response");
             }
@@ -67,7 +77,7 @@ export default function AIChatbot({ conversationId: initialConversationId }: Cha
                 const Botmessage = {
                     id: Date.now(),
                     type: 'bot',
-                    CONTENT: response.response.choices[0].message.content,
+                    message: response.response.choices[0].message.message,
                     timestamp: new Date(),
                 }
                 setMessages(prev => [...prev, Botmessage]);
@@ -79,7 +89,7 @@ export default function AIChatbot({ conversationId: initialConversationId }: Cha
             setMessages(prev => [...prev, {
                 id: Date.now(),
                 type: 'bot',
-                CONTENT: error.message || 'An error occurred',
+                message: error.message || 'An error occurred',
                 timestamp: new Date()
             }]);
 
@@ -247,7 +257,7 @@ export default function AIChatbot({ conversationId: initialConversationId }: Cha
                                             : `${theme.botMessageBg} ${theme.text}`
                                             }`}
                                     >
-                                        <p className="leading-relaxed text-sm">{message.CONTENT}</p>
+                                        <p className="leading-relaxed text-sm">{message.message}</p>
                                     </div>
                                 </div>
 
@@ -288,7 +298,7 @@ export default function AIChatbot({ conversationId: initialConversationId }: Cha
                                 onKeyUp={handleKeyPress}
                                 placeholder="Message SparkAi..."
                                 rows={1}
-                                className={`w-full ${theme.inputBg} border field-sizing-CONTENT ${theme.inputBorder} ${theme.inputFocus} overflow-y-scroll scrollbar-hide [scrollbar-width:none] [&::-webkit-scrollbar]:hidden resize-none h-full  rounded-xl px-4 py-3 pr-12 ${theme.text} placeholder-gray-500 focus:outline-none resize-none transition-colors`}
+                                className={`w-full ${theme.inputBg} border field-sizing-message ${theme.inputBorder} ${theme.inputFocus} overflow-y-scroll scrollbar-hide [scrollbar-width:none] [&::-webkit-scrollbar]:hidden resize-none h-full  rounded-xl px-4 py-3 pr-12 ${theme.text} placeholder-gray-500 focus:outline-none resize-none transition-colors`}
                                 style={{ minHeight: '52px', maxHeight: '200px' }}
                             />
                             <button
