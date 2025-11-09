@@ -13,12 +13,27 @@ export interface Model {
   isPremium?: boolean;
 }
 
+export enum ROLE {
+  USER = "USER",
+  ASSISTANT = "ASSISTANT",
+}
+
+export interface ChatSchema {
+  id: string
+  conversationId: string
+  createdAt: Date
+  updatedAt: Date
+  role: ROLE,
+  content: string
+}
+
 export enum ModelProvider {
   GOOGLE = "google",
   OPENAI = "openai",
   ANTHROPIC = "anthropics",
   OPENROUTER = "openrouter",
 }
+
 export enum ModelCapability {
   TEXT = "text",
   VISION = "VISION",
@@ -35,4 +50,9 @@ export const CreateChatSchema = z.object({
   model: z.enum(SUPPORTER_MODELS)
 })
 
+export type Message = {
+  role: ROLE,
+  content: string,
+}
 
+export type Messages = Message[];

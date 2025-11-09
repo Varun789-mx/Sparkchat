@@ -3,8 +3,10 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/options";
 import { PrismaClient } from "@prisma/client";
-import { getModelById, MODELS } from "@/models/constants";
-import { CreateChatSchema } from "@/models/types";
+import {  MODELS } from "@/models/constants";
+import {  ROLE } from "@/models/types";
+import { InMemoryStore } from "@/lib/InMemoryStore";
+import { GetModelResponse } from "@/lib/GetModelResponse";
 const genai = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API || "");
 
 
@@ -38,18 +40,20 @@ export async function POST(req: Request) {
 export async function GET(req: Request) {
     const session = await getServerSession(authOptions);
     const prisma = new PrismaClient();
-    const { success, data } = CreateChatSchema.safeParse(req.body);
 
-    const ConversationId = data?.conversationId;
+    const { searchParams } = new URL(req.url);
+    const conversationId = searchParams.get('conversationId');
+    const modelId = searchParams.get('modelId');
+    const message = searchParams.get('message');
 
-    if (!success || !ConversationId) {
+    if (!conversationId || !modelId || !message) {
         return NextResponse.json({
-            error: "Incorrect Inputs",
-        })
-    }
+            message: "Missing required params:"
+        }, { status: 400 })
+    };
 
-    const model = MODELS.find((model) => model.id == data.model);
-    if (!model) {
+    const Selectedmodel = MODELS.find((model) => model.id === modelId);
+    if (!Selectedmodel) {
         return NextResponse.json({
             Error: "Model not supported or not found"
         })
@@ -58,9 +62,9 @@ export async function GET(req: Request) {
     if (!session) {
         return NextResponse.json({
             error: "Unauthorized user",
-        })
+        }, { status: 401 })
     }
-    const userid = session.user.id;
+    const userid = await session.user.id;
     const Getuser = await prisma.user.findUnique({
         where: {
             id: session.user.id
@@ -70,18 +74,23 @@ export async function GET(req: Request) {
     if (!Getuser) {
         return NextResponse.json({
             error: "User not found"
-        })
+        }, { status: 404 })
+    }
+    if (Selectedmodel.isPremium && !Getuser.isPremium) {
+        return NextResponse.json({
+            error: "Premium model request ,Please subscribe for premium models",
+        }, { status: 403 })
     }
 
-    if (!Getuser?.isPremium || model.isPremium) {
+    if (Getuser.credits <= 0) {
         return NextResponse.json({
-            error: "Not enough credits",
-        })
+            error: "Insufficient credits"
+        }, { status: 402 });
     }
 
     const execution = await prisma.execution.findFirst({
         where: {
-            id: ConversationId,
+            id: conversationId,
             userId: userid,
         }
     })
@@ -89,37 +98,106 @@ export async function GET(req: Request) {
     if (execution && execution.type !== 'CONVERSATION') {
         return NextResponse.json({
             error: "Conversation exists but owner is differernt"
-        })
+        }, { status: 408 })
     }
 
     if (!execution) {
         await prisma.$transaction([
             prisma.execution.create({
                 data: {
-                    id: ConversationId,
+                    id: conversationId,
                     userId: Getuser.id,
-                    title: data.message.slice(0, 20) + "...",
+                    title: message.slice(0, 20) + "...",
                     type: "CONVERSATION",
-                    externalId: ConversationId
+                    externalId: conversationId
                 }
             }),
             prisma.conversation.create({
                 data: {
-                    id: ConversationId,
+                    id: conversationId,
                 }
             })
         ])
     }
 
-    if(Getuser.credits <= 0) { 
-        return NextResponse.json({
-            message:"Insufficient credits ",
+    let existingMessages = InMemoryStore.getInstance().get(conversationId);
+
+    if (!existingMessages.length) {
+        const dbmessages = await prisma.message.findMany({
+            where: { conversationId },
+            orderBy: { createdAt: 'asc' }
         })
+        dbmessages.map((msg) => {
+            InMemoryStore.getInstance().add(conversationId, {
+                role: msg.role as ROLE,
+                content: msg.content,
+            })
+        })
+        existingMessages = InMemoryStore.getInstance().get(conversationId);
     }
-    
 
+    InMemoryStore.getInstance().add(conversationId, {
+        role: ROLE.USER,
+        content: message
+    });
 
+    const allmessages = InMemoryStore.getInstance().get(conversationId);
+    let fullresponse = '';
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+        async start(controller) {
+            try {
+                await GetModelResponse(
+                    allmessages,
+                    Selectedmodel.id,
+                    (chunk: string) => {
+                        fullresponse += chunk;
+                        controller.enqueue(
+                            encoder.encode(`data: ${JSON.stringify({ content: chunk })}\n\n`)
+                        )
+                    }
+                );
+                InMemoryStore.getInstance().add(conversationId, {
+                    role: ROLE.ASSISTANT,
+                    content: fullresponse,
+                });
 
-
-
-}
+                await prisma.$transaction([
+                    prisma.message.createMany({
+                        data: [{
+                            conversationId,
+                            role: ROLE.USER,
+                            content: message
+                        }, {
+                            conversationId,
+                            role: ROLE.ASSISTANT,
+                            content: fullresponse
+                        }
+                        ]
+                    }),
+                    prisma.user.update({
+                        where: { id: userid },
+                        data: { credits: { decrement: 1 } }
+                    })
+                ])
+                controller.enqueue(encoder.encode(`data: [DONE]\n\n`));
+                controller.close();
+            } catch (error: any) {
+                console.log("Stream Error", error);
+                controller.enqueue(
+                    encoder.encode(`data:${JSON.stringify({ error: error.message })}\n\n`)
+                )
+                controller.error(error);
+            } finally {
+                await prisma.$disconnect();
+            }
+        }
+    })
+    return new Response(stream, {
+        headers: {
+            'Content-Type': 'text/event-stream',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive',
+        }
+    })
+}     

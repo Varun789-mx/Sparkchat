@@ -1,11 +1,16 @@
 "use client"
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Plus, Menu, Sparkles, User, Bot, ChevronDown, Sun, Moon, LoaderCircle } from 'lucide-react';
-import { sendMessage, GetModelResponse } from '../actions/chat';
 import { signOut } from 'next-auth/react';
+import axios from 'axios';
 
 
-export default function AIChatbot() {
+
+interface ChatboxinputProps {
+    conversationId?: string;
+}
+
+export default function AIChatbot({ conversationId: initialConversationId }: ChatboxinputProps) {
     const [messages, setMessages] = useState([
         {
             id: 1,
@@ -18,7 +23,9 @@ export default function AIChatbot() {
     const [isTyping, setIsTyping] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(true);
     const messagesEndRef = useRef(null);
-    // const [Conversation,setconversation]
+    const [conversationId, setconversationId] = useState<string | null>(
+        initialConversationId || v4()
+    );
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -43,9 +50,12 @@ export default function AIChatbot() {
         setIsTyping(true);
 
         try {
-            const response = await GetModelResponse({
-                MODEL: userMessage.MODEL,
-                PROMPT: userMessage.CONTENT,
+            const response = await axios.get('http://localhost:3000/chat', {
+                params: {
+                    conversationId: conversationId,
+                    MODEL: userMessage.MODEL,
+                    PROMPT: userMessage.CONTENT,
+                }
             });
 
             console.log(response, "From all");
@@ -60,8 +70,8 @@ export default function AIChatbot() {
                     CONTENT: response.response.choices[0].message.content,
                     timestamp: new Date(),
                 }
-                  setMessages(prev => [...prev, Botmessage]);
-                  setIsTyping(false);
+                setMessages(prev => [...prev, Botmessage]);
+                setIsTyping(false);
             }
         } catch (error: any) {
             console.log(error);
