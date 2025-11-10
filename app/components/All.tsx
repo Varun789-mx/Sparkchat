@@ -1,30 +1,36 @@
 "use client"
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Plus, Menu, Sparkles, User, Bot, ChevronDown, Sun, Moon, LoaderCircle } from 'lucide-react';
+import { Send, Plus, Menu, Sparkles, User, Bot, ChevronDown, Sun, Moon } from 'lucide-react';
 import { signOut } from 'next-auth/react';
-import axios from 'axios';
+import { v4 } from "uuid";
 
+interface Message {
+    id: number;
+    role: 'USER' | 'ASSISTANT';
+    content: string;
+    timestamp: Date;
+}
 
-
-interface ChatboxinputProps {
+interface AIChatbotProps {
     conversationId?: string;
 }
 
-export default function AIChatbot({ conversationId: initialConversationId }: ChatboxinputProps) {
-    const [messages, setMessages] = useState([
+export default function AIChatbot({ conversationId: initialConversationId }: AIChatbotProps) {
+    const [messages, setMessages] = useState<Message[]>([
         {
             id: 1,
-            type: 'bot',
-            message: 'Hello! I\'m your AI assistant. How can I help you today?',
+            role: 'ASSISTANT',
+            content: 'Hello! I\'m your AI assistant. How can I help you today?',
             timestamp: new Date()
         }
     ]);
     const [input, setInput] = useState('');
     const [isTyping, setIsTyping] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(true);
-    const messagesEndRef = useRef(null);
-    const [conversationId, setconversationId] = useState<string | null>(
-        initialConversationId || v4()
+    const [currentResponse, setCurrentResponse] = useState('');
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const [conversationId, setConversationId] = useState<string | null>(
+        initialConversationId || null
     );
 
     const scrollToBottom = () => {
@@ -33,75 +39,134 @@ export default function AIChatbot({ conversationId: initialConversationId }: Cha
 
     useEffect(() => {
         scrollToBottom();
-    }, [messages]);
+    }, [messages, currentResponse]);
+
     const handleSend = async () => {
         if (!input.trim()) return;
 
-        const userMessage = {
-            id: Date.now(), // Better unique ID
-            type: 'user',
-            message: input,
-            MODEL: 'gpt-3.5-turbo',
+        const userMessage: Message = {
+            id: Date.now(),
+            role: 'USER',
+            content: input,
             timestamp: new Date(),
         };
 
-        setMessages([...messages, userMessage]);
+        setMessages(prev => [...prev, userMessage]);
+        const currentInput = input;
         setInput('');
         setIsTyping(true);
-
+        setCurrentResponse('');
 
         try {
             const params = new URLSearchParams({
-                conversationId:conversationId,
-                MODEL:MODEL,
-                message:message
-            })
-            const response = await fetch(`http://localhost:3000/chat?${params}`, {
+                modelId: "mistralai/mistral-7b-instruct",
+                message: currentInput  // ✅ Send only current message
+            });
+
+            // ✅ Only add conversationId if it exists
+            if (conversationId) {
+                params.append('conversationId', conversationId);
+            }
+
+            const response = await fetch(`/api/chat?${params}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'text/event-stream',
                 },
             });
 
-            console.log(response, "From all");
-            const reader = response.body?.pipeThrough(new TextDecoderStream()).getReader()
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const reader = response.body?.getReader();
+            const decoder = new TextDecoder();
+
+            if (!reader) throw new Error('Response body is not readable');
+
+            let buffer = '';
+            let accumulatedText = '';
+
             while (true) {
-                const { value, done } = await reader?.read()
+                const { done, value } = await reader.read();
                 if (done) break;
-                setMessages((prev) => prev + value);
-            }
-            if (!response.success) {
-                throw new Error("Unable to get response");
-            }
-            if (response.response) {
-                const Botmessage = {
-                    id: Date.now(),
-                    type: 'bot',
-                    message: response.response.choices[0].message.message,
-                    timestamp: new Date(),
+
+                buffer += decoder.decode(value, { stream: true });
+
+                while (true) {
+                    const lineEnd = buffer.indexOf('\n');
+                    if (lineEnd === -1) break;
+
+                    const line = buffer.slice(0, lineEnd).trim();
+                    buffer = buffer.slice(lineEnd + 1);
+
+                    if (line.startsWith('data: ')) {
+                        const data = line.slice(6);
+
+                        if (data === '[DONE]') {
+                            const botMessage: Message = {
+                                id: Date.now(),
+                                role: 'ASSISTANT',
+                                content: accumulatedText,
+                                timestamp: new Date(),
+                            };
+                            setMessages(prev => [...prev, botMessage]);
+                            setCurrentResponse('');
+                            setIsTyping(false);
+                            return;
+                        }
+
+                        try {
+                            const parsed = JSON.parse(data);
+
+                            // ✅ Capture conversationId from first message
+                            if (parsed.conversationId && !conversationId) {
+                                setConversationId(parsed.conversationId);
+                            }
+
+                            if (parsed.content) {
+                                accumulatedText += parsed.content;
+                                setCurrentResponse(accumulatedText);
+                            }
+
+                            if (parsed.error) {
+                                throw new Error(parsed.error);
+                            }
+                        } catch (e) {
+                            console.error('Parse error:', e);
+                        }
+                    }
                 }
-                setMessages(prev => [...prev, Botmessage]);
-                setIsTyping(false);
             }
         } catch (error: any) {
-            console.log(error);
-
+            console.error('Error:', error);
             setMessages(prev => [...prev, {
                 id: Date.now(),
-                type: 'bot',
-                message: error.message || 'An error occurred',
+                role: 'ASSISTANT',
+                content: `Error: ${error.message || 'An error occurred'}`,
                 timestamp: new Date()
             }]);
-
             setIsTyping(false);
+            setCurrentResponse('');
         }
     };
 
-    const handleKeyPress = (e) => {
+    const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             handleSend();
         }
+    };
+
+    const handleNewChat = () => {
+        setConversationId(null);
+        setMessages([{
+            id: 1,
+            role: 'ASSISTANT',
+            content: 'Hello! I\'m your AI assistant. How can I help you today?',
+            timestamp: new Date()
+        }]);
+        setCurrentResponse('');
     };
 
     const suggestedPrompts = [
@@ -110,9 +175,10 @@ export default function AIChatbot({ conversationId: initialConversationId }: Cha
         "Help me debug code",
         "Plan a travel itinerary"
     ];
-    const handlesignout = async () => {
+
+    const handleSignOut = async () => {
         await signOut();
-    }
+    };
 
     // Theme classes
     const theme = {
@@ -142,10 +208,14 @@ export default function AIChatbot({ conversationId: initialConversationId }: Cha
         <div className={`flex h-screen ${theme.bg}`}>
             {/* Sidebar */}
             <div className={`w-72 ${theme.sidebar} border-r ${theme.sidebarBorder} flex flex-col`}>
-                {/* Sidebar Header */}
-                <button className='bg-blue-500 rounded-lg font-bold p-2' type='button' onClick={handlesignout}>Log out</button>
+                <button className='bg-blue-500 rounded-lg font-bold p-2 m-4' type='button' onClick={handleSignOut}>
+                    Log out
+                </button>
                 <div className={`p-4 border-b ${theme.sidebarBorder}`}>
-                    <button className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-gray-700 hover:bg-gray-800 transition-colors text-white font-medium">
+                    <button 
+                        onClick={handleNewChat}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-gray-700 hover:bg-gray-800 transition-colors text-white font-medium"
+                    >
                         <Plus className="w-4 h-4" />
                         New Chat
                     </button>
@@ -153,20 +223,11 @@ export default function AIChatbot({ conversationId: initialConversationId }: Cha
 
                 {/* Chat History */}
                 <div className="flex-1 overflow-y-auto p-3 space-y-1">
-                    <div className={`text-xs font-medium ${theme.textMuted} uppercase tracking-wider mb-2 px-3`}>Today</div>
+                    <div className={`text-xs font-medium ${theme.textMuted} uppercase tracking-wider mb-2 px-3`}>
+                        Today
+                    </div>
                     <button className={`w-full text-left px-3 py-2.5 rounded-lg ${theme.chatItemActive} transition-colors ${theme.text} text-sm`}>
                         AI Assistant Conversation
-                    </button>
-                    <button className={`w-full text-left px-3 py-2.5 rounded-lg ${theme.chatItemHover} transition-colors ${theme.textSecondary} text-sm`}>
-                        Previous Chat Example
-                    </button>
-
-                    <div className={`text-xs font-medium ${theme.textMuted} uppercase tracking-wider mb-2 mt-4 px-3`}>Yesterday</div>
-                    <button className={`w-full text-left px-3 py-2.5 rounded-lg ${theme.chatItemHover} transition-colors ${theme.textSecondary} text-sm`}>
-                        Code Debug Session
-                    </button>
-                    <button className={`w-full text-left px-3 py-2.5 rounded-lg ${theme.chatItemHover} transition-colors ${theme.textSecondary} text-sm`}>
-                        Creative Writing Help
                     </button>
                 </div>
 
@@ -223,7 +284,9 @@ export default function AIChatbot({ conversationId: initialConversationId }: Cha
                                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-600 flex items-center justify-center">
                                     <Sparkles className="w-8 h-8 text-white" />
                                 </div>
-                                <h2 className={`text-2xl font-semibold ${theme.text} mb-2`}>How can I help you today?</h2>
+                                <h2 className={`text-2xl font-semibold ${theme.text} mb-2`}>
+                                    How can I help you today?
+                                </h2>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-w-2xl mx-auto mt-6">
                                     {suggestedPrompts.map((prompt, index) => (
@@ -242,26 +305,27 @@ export default function AIChatbot({ conversationId: initialConversationId }: Cha
                         {messages.map((message) => (
                             <div
                                 key={message.id}
-                                className={`flex gap-3 mb-6 ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                                className={`flex gap-3 mb-6 ${message.role === 'USER' ? 'justify-end' : 'justify-start'}`}
                             >
-                                {message.type === 'bot' && (
+                                {message.role === 'ASSISTANT' && (
                                     <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
                                         <Bot className="w-4 h-4 text-white" />
                                     </div>
                                 )}
 
-                                <div className={`max-w-2xl ${message.type === 'user' ? 'order-first' : ''}`}>
+                                <div className={`max-w-2xl ${message.role === 'USER' ? 'order-first' : ''}`}>
                                     <div
-                                        className={`rounded-2xl px-4 py-3 ${message.type === 'user'
-                                            ? `${theme.userMessageBg} text-white`
-                                            : `${theme.botMessageBg} ${theme.text}`
-                                            }`}
+                                        className={`rounded-2xl px-4 py-3 ${
+                                            message.role === 'USER'
+                                                ? `${theme.userMessageBg} text-white`
+                                                : `${theme.botMessageBg} ${theme.text}`
+                                        }`}
                                     >
-                                        <p className="leading-relaxed text-sm">{message.message}</p>
+                                        <p className="leading-relaxed text-sm">{message.content}</p>
                                     </div>
                                 </div>
 
-                                {message.type === 'user' && (
+                                {message.role === 'USER' && (
                                     <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center shrink-0 text-white text-xs font-medium">
                                         U
                                     </div>
@@ -269,7 +333,22 @@ export default function AIChatbot({ conversationId: initialConversationId }: Cha
                             </div>
                         ))}
 
-                        {isTyping && (
+                        {/* Current streaming response */}
+                        {currentResponse && (
+                            <div className="flex gap-3 mb-6">
+                                <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
+                                    <Bot className="w-4 h-4 text-white" />
+                                </div>
+                                <div className={`max-w-2xl ${theme.botMessageBg} rounded-2xl px-4 py-3`}>
+                                    <p className="leading-relaxed text-sm whitespace-pre-wrap">
+                                        {currentResponse}
+                                        <span className="animate-pulse">▋</span>
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+
+                        {isTyping && !currentResponse && (
                             <div className="flex gap-3 mb-6">
                                 <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
                                     <Bot className="w-4 h-4 text-white" />
@@ -290,27 +369,27 @@ export default function AIChatbot({ conversationId: initialConversationId }: Cha
 
                 {/* Input Area */}
                 <div className={`border-t ${theme.headerBorder} ${theme.header} p-4`}>
-                    <div className="max-w-3xl mx-auto ">
-                        <div className="relative ">
+                    <div className="max-w-3xl mx-auto">
+                        <div className="relative">
                             <textarea
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
-                                onKeyUp={handleKeyPress}
+                                onKeyDown={handleKeyPress}
                                 placeholder="Message SparkAi..."
                                 rows={1}
-                                className={`w-full ${theme.inputBg} border field-sizing-message ${theme.inputBorder} ${theme.inputFocus} overflow-y-scroll scrollbar-hide [scrollbar-width:none] [&::-webkit-scrollbar]:hidden resize-none h-full  rounded-xl px-4 py-3 pr-12 ${theme.text} placeholder-gray-500 focus:outline-none resize-none transition-colors`}
+                                className={`w-full ${theme.inputBg} border ${theme.inputBorder} ${theme.inputFocus} rounded-xl px-4 py-3 pr-12 ${theme.text} placeholder-gray-500 focus:outline-none resize-none transition-colors`}
                                 style={{ minHeight: '52px', maxHeight: '200px' }}
                             />
                             <button
                                 onClick={handleSend}
-                                disabled={!input.trim()}
-                                className={`absolute right-2 bottom-2 w-8 h-8 rounded-lg flex items-center justify-center transition-all ${input.trim()
-                                    ? 'bg-blue-600 hover:bg-blue-700'
-                                    : `${theme.inputBg} cursor-not-allowed`
-                                    }`}
-
+                                disabled={!input.trim() || isTyping}
+                                className={`absolute right-2 bottom-2 w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
+                                    input.trim() && !isTyping
+                                        ? 'bg-blue-600 hover:bg-blue-700'
+                                        : `${theme.inputBg} cursor-not-allowed`
+                                }`}
                             >
-                                <Send className={`w-4 h-4 items-center ${input.trim() ? 'text-white' : 'text-gray-500'}`} />
+                                <Send className={`w-4 h-4 ${input.trim() && !isTyping ? 'text-white' : 'text-gray-500'}`} />
                             </button>
                         </div>
                         <p className={`text-center ${theme.textMuted} text-xs mt-2`}>

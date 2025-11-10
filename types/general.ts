@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { MODELS } from "./constants";
+import { MODELS } from "../models/constants";
 
 export interface Model {
   id: string;
@@ -20,7 +20,6 @@ export enum ROLE {
 
 export interface ChatSchema {
   id: string
-  conversationId: string
   createdAt: Date
   updatedAt: Date
   role: ROLE,
@@ -40,9 +39,10 @@ export enum ModelCapability {
   CODE = "code",
   FUNCTION_CALLING = "function_calling",
 }
+export type MODEL = typeof SUPPORTER_MODELS[number];
+
 
 export const SUPPORTER_MODELS = MODELS.map(model => model.id)
-export type MODEL = typeof SUPPORTER_MODELS[number];
 
 export const CreateChatSchema = z.object({
   conversationId: z.uuid().optional(),

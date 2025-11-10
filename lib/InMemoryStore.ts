@@ -1,4 +1,4 @@
-import type { Message } from "@/models/types";
+import type { Message } from "@/types/general";
 import { date } from "zod/v3";
 const ENVICTION_TIME = 1 * 60 * 1000;
 const ENVICTION_CLOCK_TIME = 1 * 60 * 1000;

@@ -1,4 +1,4 @@
-import type { Message, MODEL } from "@/models/types";
+import type { Message, MODEL } from "@/types/general";
 const MAX_TOKEN_ITERATONS = 1000;
 
 export const GetModelResponse = async (

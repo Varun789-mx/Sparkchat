@@ -1,4 +1,4 @@
-import { type Model, ModelCapability, ModelProvider } from "./types";
+import { type Model, ModelCapability, ModelProvider } from "../types/general";
 
 export const MODELS: Model[] = [
   {
