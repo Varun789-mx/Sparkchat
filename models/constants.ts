@@ -1,5 +1,5 @@
 import { type Model, ModelCapability, ModelProvider } from "../types/general";
-
+import {z} from "zod";
 export const MODELS: Model[] = [
   {
     id: "google/gemini-2.5-pro",
@@ -263,3 +263,11 @@ export const getAvailableModels = (): Model[] => {
   return MODELS.filter((model) => model.isAvailable !== false);
 };
 
+export type MODEL = typeof SUPPORTER_MODELS[number];
+
+export const SUPPORTER_MODELS = MODELS.map(model => model.id)
+export const CreateChatSchema = z.object({
+  conversationId: z.uuid().optional(),
+  message: z.string().max(1000),
+  model: z.enum(SUPPORTER_MODELS)
+})

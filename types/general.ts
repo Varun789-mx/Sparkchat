@@ -1,12 +1,12 @@
 import { z } from "zod";
-import { MODELS } from "../models/constants";
+import { SUPPORTER_MODELS } from "../models/constants";
 
 export interface Model {
   id: string;
   name?: string;
   provider?: ModelProvider;
   description?: string;
-  maxTokens?: Number;
+  maxTokens?: number;
   pricePer1kTokens?: number;
   capabilities: ModelCapability[];
   isAvailable?: boolean;
@@ -29,26 +29,20 @@ export interface ChatSchema {
 export enum ModelProvider {
   GOOGLE = "google",
   OPENAI = "openai",
-  ANTHROPIC = "anthropics",
+  ANTHROPIC = "anthropic",
   OPENROUTER = "openrouter",
 }
 
 export enum ModelCapability {
   TEXT = "text",
-  VISION = "VISION",
+  VISION = "vision",
   CODE = "code",
   FUNCTION_CALLING = "function_calling",
 }
 export type MODEL = typeof SUPPORTER_MODELS[number];
 
 
-export const SUPPORTER_MODELS = MODELS.map(model => model.id)
 
-export const CreateChatSchema = z.object({
-  conversationId: z.uuid().optional(),
-  message: z.string().max(1000),
-  model: z.enum(SUPPORTER_MODELS)
-})
 
 export type Message = {
   role: ROLE,

@@ -3,8 +3,8 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/options";
 import { PrismaClient } from "@prisma/client";
-import { MODELS } from "@/models/constants";
-import type { Model, ROLE } from "@/types/general";
+import { getModelById, MODELS } from "@/models/constants";
+import  { Model, ROLE } from "@/types/general";
 import { InMemoryStore } from "@/lib/InMemoryStore";
 import { GetModelResponse } from "@/lib/GetModelResponse";
 const genai = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API || "");
@@ -45,7 +45,7 @@ export async function GET(req: Request) {
   const modelId = searchParams.get("modelId");
   const message = searchParams.get("message");
 
-  if (!conversationId || !modelId || !message) {
+  if ( !conversationId || !modelId || !message) {
     return NextResponse.json(
       {
         message: "Missing required params:",
@@ -54,7 +54,7 @@ export async function GET(req: Request) {
     );
   }
 
-  const Selectedmodel = s
+  const Selectedmodel = getModelById(modelId);
   if (!Selectedmodel) {
     return NextResponse.json({
       Error: "Model not supported or not found",
@@ -175,7 +175,7 @@ export async function GET(req: Request) {
           }
         );
         InMemoryStore.getInstance().add(conversationId, {
-          role: ROLE.ASSISTANT,
+          role:ROLE.ASSISTANT,
           content: fullresponse,
         });
 

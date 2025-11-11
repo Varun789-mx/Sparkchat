@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, Plus, Menu, Sparkles, User, Bot, ChevronDown, Sun, Moon } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import { v4 } from "uuid";
+import { useModel } from '@/hooks/useModel';
 
 interface Message {
     id: number;
@@ -30,7 +31,7 @@ export default function AIChatbot({ conversationId: initialConversationId }: AIC
     const [currentResponse, setCurrentResponse] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [conversationId, setConversationId] = useState<string | null>(
-        initialConversationId || null
+        initialConversationId || v4()
     );
 
     const scrollToBottom = () => {
@@ -59,7 +60,7 @@ export default function AIChatbot({ conversationId: initialConversationId }: AIC
 
         try {
             const params = new URLSearchParams({
-                modelId: "mistralai/mistral-7b-instruct",
+                modelId: "google/gemini-2.5-flash",
                 message: currentInput  // ✅ Send only current message
             });
 
@@ -67,17 +68,13 @@ export default function AIChatbot({ conversationId: initialConversationId }: AIC
             if (conversationId) {
                 params.append('conversationId', conversationId);
             }
-
+            ``
             const response = await fetch(`/api/chat?${params}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'text/event-stream',
                 },
             });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
 
             const reader = response.body?.getReader();
             const decoder = new TextDecoder();
@@ -212,7 +209,7 @@ export default function AIChatbot({ conversationId: initialConversationId }: AIC
                     Log out
                 </button>
                 <div className={`p-4 border-b ${theme.sidebarBorder}`}>
-                    <button 
+                    <button
                         onClick={handleNewChat}
                         className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-gray-700 hover:bg-gray-800 transition-colors text-white font-medium"
                     >
@@ -315,11 +312,10 @@ export default function AIChatbot({ conversationId: initialConversationId }: AIC
 
                                 <div className={`max-w-2xl ${message.role === 'USER' ? 'order-first' : ''}`}>
                                     <div
-                                        className={`rounded-2xl px-4 py-3 ${
-                                            message.role === 'USER'
+                                        className={`rounded-2xl px-4 py-3 ${message.role === 'USER'
                                                 ? `${theme.userMessageBg} text-white`
                                                 : `${theme.botMessageBg} ${theme.text}`
-                                        }`}
+                                            }`}
                                     >
                                         <p className="leading-relaxed text-sm">{message.content}</p>
                                     </div>
@@ -383,11 +379,10 @@ export default function AIChatbot({ conversationId: initialConversationId }: AIC
                             <button
                                 onClick={handleSend}
                                 disabled={!input.trim() || isTyping}
-                                className={`absolute right-2 bottom-2 w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
-                                    input.trim() && !isTyping
+                                className={`absolute right-2 bottom-2 w-8 h-8 rounded-lg flex items-center justify-center transition-all ${input.trim() && !isTyping
                                         ? 'bg-blue-600 hover:bg-blue-700'
                                         : `${theme.inputBg} cursor-not-allowed`
-                                }`}
+                                    }`}
                             >
                                 <Send className={`w-4 h-4 ${input.trim() && !isTyping ? 'text-white' : 'text-gray-500'}`} />
                             </button>

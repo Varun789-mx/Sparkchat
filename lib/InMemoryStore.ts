@@ -1,5 +1,4 @@
 import type { Message } from "@/types/general";
-import { date } from "zod/v3";
 const ENVICTION_TIME = 1 * 60 * 1000;
 const ENVICTION_CLOCK_TIME = 1 * 60 * 1000;
 
@@ -17,7 +16,7 @@ export class InMemoryStore {
         this.store = {}
         this.clock = setInterval(() => {
             Object.entries(this.store).forEach(([key, { evictionTime }]) => {
-                if (evictionTime > Date.now()) {
+                if (evictionTime < Date.now()) {
                     delete this.store[key]
                 }
             })
@@ -40,7 +39,7 @@ export class InMemoryStore {
     }
 
     add(conversationId: string, message: Message) {
-        if (this.store[conversationId]) {
+        if (!this.store[conversationId]) {
             this.store[conversationId] = {
                 messages: [],
                 evictionTime: Date.now() + ENVICTION_TIME
