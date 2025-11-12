@@ -1,9 +1,10 @@
-import type { Message, MODEL } from "@/types/general";
+import type { Message } from "@/types/general";
 const MAX_TOKEN_ITERATONS = 1000;
+import { MODELS } from "@/models/constants";
 
 export const GetModelResponse = async (
   messages: Message[],
-  model: MODEL,
+  model: "x-ai/grok-3-mini",
   cb: (chunk: string) => void,
   systemprompt?: string,
 ) => {
@@ -22,7 +23,7 @@ export const GetModelResponse = async (
           system: systemprompt,
         }),
       });
-    
+
 
     const reader = response.body?.getReader();
     if (!reader) {

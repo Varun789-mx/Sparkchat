@@ -39,14 +39,14 @@ export enum ModelCapability {
   CODE = "code",
   FUNCTION_CALLING = "function_calling",
 }
-export type MODEL = typeof SUPPORTER_MODELS[number];
-
-
-
 
 export type Message = {
   role: ROLE,
   content: string,
+}
+export interface ExecutionType {
+  id?: string;
+  title?: string;
 }
 
 export type Messages = Message[];

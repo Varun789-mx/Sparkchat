@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { DEFAULT_MODEL_ID, getModelById } from "@/models/constants";
+import { DEFAULT_MODEL_ID } from "@/models/constants";
 interface userModelOptions {
   initialModel?: string;
   storageKey?: string;
   persistTolocalStorage?: boolean;
 }
 
-export function useMOdel({
+export function useModel({
   initialModel = DEFAULT_MODEL_ID,
   storageKey = "PREFERRED_MODEL",
   persistTolocalStorage = true,

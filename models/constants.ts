@@ -266,6 +266,7 @@ export const getAvailableModels = (): Model[] => {
 export type MODEL = typeof SUPPORTER_MODELS[number];
 
 export const SUPPORTER_MODELS = MODELS.map(model => model.id)
+
 export const CreateChatSchema = z.object({
   conversationId: z.uuid().optional(),
   message: z.string().max(1000),
