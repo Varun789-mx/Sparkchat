@@ -7,11 +7,11 @@ async function main() {
   console.log('Start seeding...');
 
   // Clear existing data (optional - comment out if you want to keep existing data)
-  // await prisma.message.deleteMany();
-  // await prisma.conversation.deleteMany();
-  // await prisma.app.deleteMany();
-  // await prisma.execution.deleteMany();
-  // await prisma.user.deleteMany();
+  await prisma.message.deleteMany();
+  await prisma.conversation.deleteMany();
+  await prisma.app.deleteMany();
+  await prisma.execution.deleteMany();
+  await prisma.user.deleteMany();
 
   // Create users
   const hashedPassword = await bcrypt.hash('password123', 10);
@@ -74,6 +74,65 @@ async function main() {
       userId: user2.id,
     },
   });
+   const execution5 = await prisma.execution.create({
+    data: {
+      title: 'My First Conversation',
+      type: 'CONVERSATION',
+      userId: user1.id,
+      externalId: 'conv-001',
+    },
+  });
+   const execution6 = await prisma.execution.create({
+    data: {
+      title: 'My First Conversation',
+      type: 'CONVERSATION',
+      userId: user1.id,
+      externalId: 'conv-001',
+    },
+  });
+   const execution7 = await prisma.execution.create({
+    data: {
+      title: 'My First Conversation',
+      type: 'CONVERSATION',
+      userId: user1.id,
+      externalId: 'conv-001',
+    },
+  });
+   const execution8 = await prisma.execution.create({
+    data: {
+      title: 'My First Conversation',
+      type: 'CONVERSATION',
+      userId: user1.id,
+      externalId: 'conv-001',
+    },
+  });
+   const execution9 = await prisma.execution.create({
+    data: {
+      title: 'My First Conversation',
+      type: 'CONVERSATION',
+      userId: user1.id,
+      externalId: 'conv-001',
+    },
+  });
+   const execution10 = await prisma.execution.create({
+    data: {
+      title: 'My First Conversation',
+      type: 'CONVERSATION',
+      userId: user1.id,
+      externalId: 'conv-001',
+    },
+  });
+  for (let i = 0; i < 15; i++) {
+    await prisma.execution.create({
+    data: {
+      title: 'My First Conversation',
+      type: 'CONVERSATION',
+      userId: user1.id,
+      externalId: 'conv-001',
+    },
+  });
+    
+  }
 
   console.log('Created executions');
 
@@ -89,6 +148,42 @@ async function main() {
           {
             role: 'ASSISTANT',
             content: 'Of course! I\'d be happy to help you with Next.js. What would you like to know?',
+          },
+          {
+            role: 'USER',
+            content: 'How do I set up server components?',
+          },
+          {
+            role: 'USER',
+            content: 'How do I set up server components?',
+          },
+          {
+            role: 'USER',
+            content: 'How do I set up server components?',
+          },
+          {
+            role: 'USER',
+            content: 'How do I set up server components?',
+          },
+          {
+            role: 'USER',
+            content: 'How do I set up server components?',
+          },
+          {
+            role: 'USER',
+            content: 'How do I set up server components?',
+          },
+          {
+            role: 'USER',
+            content: 'How do I set up server components?',
+          },
+          {
+            role: 'USER',
+            content: 'How do I set up server components?',
+          },
+          {
+            role: 'USER',
+            content: 'How do I set up server components?',
           },
           {
             role: 'USER',

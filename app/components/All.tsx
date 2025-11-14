@@ -4,6 +4,7 @@ import { Send, Plus, Menu, Sparkles, User, Bot, ChevronDown, Sun, Moon } from 'l
 import { signOut } from 'next-auth/react';
 import { v4 } from "uuid";
 import { useModel } from '@/hooks/useModel';
+import { Chatlist } from './SIdebar';
 
 interface Message {
     id: number;
@@ -208,16 +209,6 @@ export default function AIChatbot({ conversationId: initialConversationId }: AIC
                 <button className='bg-blue-500 rounded-lg font-bold p-2 m-4' type='button' onClick={handleSignOut}>
                     Log out
                 </button>
-                <div className={`p-4 border-b ${theme.sidebarBorder}`}>
-                    <button
-                        onClick={handleNewChat}
-                        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-gray-700 hover:bg-gray-800 transition-colors text-white font-medium"
-                    >
-                        <Plus className="w-4 h-4" />
-                        New Chat
-                    </button>
-                </div>
-
                 {/* Chat History */}
                 <div className="flex-1 overflow-y-auto p-3 space-y-1">
                     <div className={`text-xs font-medium ${theme.textMuted} uppercase tracking-wider mb-2 px-3`}>
@@ -227,7 +218,6 @@ export default function AIChatbot({ conversationId: initialConversationId }: AIC
                         AI Assistant Conversation
                     </button>
                 </div>
-
                 {/* User Profile */}
                 <div className={`p-3 border-t ${theme.sidebarBorder}`}>
                     <button className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg ${theme.buttonHover} transition-colors`}>
@@ -313,8 +303,8 @@ export default function AIChatbot({ conversationId: initialConversationId }: AIC
                                 <div className={`max-w-2xl ${message.role === 'USER' ? 'order-first' : ''}`}>
                                     <div
                                         className={`rounded-2xl px-4 py-3 ${message.role === 'USER'
-                                                ? `${theme.userMessageBg} text-white`
-                                                : `${theme.botMessageBg} ${theme.text}`
+                                            ? `${theme.userMessageBg} text-white`
+                                            : `${theme.botMessageBg} ${theme.text}`
                                             }`}
                                     >
                                         <p className="leading-relaxed text-sm">{message.content}</p>
@@ -380,8 +370,8 @@ export default function AIChatbot({ conversationId: initialConversationId }: AIC
                                 onClick={handleSend}
                                 disabled={!input.trim() || isTyping}
                                 className={`absolute right-2 bottom-2 w-8 h-8 rounded-lg flex items-center justify-center transition-all ${input.trim() && !isTyping
-                                        ? 'bg-blue-600 hover:bg-blue-700'
-                                        : `${theme.inputBg} cursor-not-allowed`
+                                    ? 'bg-blue-600 hover:bg-blue-700'
+                                    : `${theme.inputBg} cursor-not-allowed`
                                     }`}
                             >
                                 <Send className={`w-4 h-4 ${input.trim() && !isTyping ? 'text-white' : 'text-gray-500'}`} />
