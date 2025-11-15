@@ -19,9 +19,10 @@ export default function Navbar() {
     }
         , [])
     const [sidebarOpen, setSidebarOpen] = useState(true);
-    const [isDarkMode, setIsDarkMode] = useState(true);
+    const [isDarkMode, setIsDarkMode] = useState(false);
     return <>
         <div className="flex h-screen bg-gray-50  text-gray-900">
+
             <div className={`${sidebarOpen ? "w-80" : "w-0"} ${isDarkMode ? "bg-[#1a1a1a]" : "bg-white"} transition-all duration-300  border-r border-gray-200 flex flex-col overflow-hidden`}>
                 <div className="p-4 border-b border-gray-200">
                     <div className="flex items-center justify-between mb-4">
@@ -59,12 +60,20 @@ export default function Navbar() {
                 </div>
                 <div>
                 </div>
-                <div>
-                    <div className="w-full flex justify-center bg-gray-500  items-end">
-                        <div className="w-2/3 rounded-lg  bg-blue-400 flex justify-center items-center align-bottom">
-                            <textarea className="w-full h-10  bg-black items-center-safe align-bottom " placeholder="your text will be here" />
+                <div className="flex-1 flex flex-col bg-black">
+                    {/* for header */}
+                    <div>
+                        {/* for header */}
+                    </div>
+                    <div className="flex-1 overflow-y-auto ">
+                        {/* chat messages space  */}
+                    </div>
+                    <div className={`w-full flex justify-center ${isDarkMode ? "bg-[#1a1a1a]" : "bg-white"} p-4`}>
+                        <div className="w-2/3 rounded-lg  flex overflow-y-auto border border-gray-700 pb-3 ">
+                            <textarea className="w-full font-medium outline-none e text-gray-200 overflow-y-auto h-auto scroll-auto scrollbar:hide" />
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
