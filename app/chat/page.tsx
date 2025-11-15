@@ -4,6 +4,7 @@ import ChatbotInterface from "../components/All";
 
 import { Chatlist } from "../components/SIdebar";
 import { SessionProvider } from "next-auth/react";
+import Chatbox from "../components/chatbox";
 
 
 
@@ -12,8 +13,9 @@ export default function Chat() {
     const conversationId = params.conversatonId as string;
     return (
         <div>
-            {/* <ChatbotInterface conversationId={conversationId} /> */}
-            <Chatlist />
+            <Chatbox/>
+            {/* <ChatbotInterface conversationId={conversationId} />
+            <Chatlist /> */}
         </div>
 
     )
