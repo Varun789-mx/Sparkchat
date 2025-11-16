@@ -1,9 +1,10 @@
 "use client"
-import { MessageSquare, X, Plus, Sidebar, ArrowBigRight, Send } from "lucide-react";
+import { MessageSquare, X, Plus, Sidebar, ArrowBigRight, Send, ChevronLeft, Crown, CrownIcon } from "lucide-react";
 import { useState } from "react"
 import type { ExecutionType } from "@/types/general";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { useEffect } from "react";
+import { MODELS } from "@/models/constants"
 import { useSession } from "next-auth/react";
 
 export default function Navbar() {
@@ -67,18 +68,17 @@ export default function Navbar() {
                     </div>
                 </footer>
             </div>
-            <div className="pt-2" hidden={sidebarOpen}>
+            {/* <div className="pt-2" hidden={sidebarOpen}>
                 <Sidebar onClick={() => setSidebarOpen(!sidebarOpen)} />
-            </div>
+            </div> */}
             <div className="flex-1 flex flex-col">
-                <div>
-                </div>
-                <div>
-                </div>
+
                 <div className="flex-1 flex flex-col bg-black">
                     {/* for header */}
-                    <div className="w-full bg-blue-500">
-                        {/* for header */}
+                    <div className={`w-full gap-5 ${isDarkMode ? "bg-[#1a1a1a]" : "bg-white"} flex justify-start p-4`}>
+                        {sidebarOpen ? <ChevronLeft /> : <Sidebar onClick={() => setSidebarOpen(!sidebarOpen)} />}
+                        <p className="font-light text-gray-200">New chat </p>
+                        <ModelSelector />
                     </div>
                     <div className="flex-1 overflow-y-auto ">
                         {/* chat messages space  */}
@@ -113,3 +113,26 @@ export default function Navbar() {
         </div>
     </>
 }
+
+const ModelSelector = () => {
+    const [selectedmodel, setselectedmodel] = useState("");
+    const HandleModelSelect = (e: any) => {
+       localStorage.setItem("modelid", e.target.value);
+       console.log(e.target.value)
+        setselectedmodel(e.target.value)
+    }
+    return (
+        <select className="bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-lg px-3 py-1.5 text-gray-400  scroll-smooth text-sm font-medium focus:outline-none focus:border-gray-600/50 hover:bg-gray-800/70 transition-all cursor-pointer">
+            {MODELS.map((opt) => (
+                <option
+                    key={opt.id}
+                    value={opt.id}
+                    onSelect={HandleModelSelect}
+                    className="bg-gray-900 text-gray-500"
+                >
+                    {opt.name} {opt.isPremium ? '👑' : ''}
+                </option>
+            ))}
+        </select>
+    );
+};
