@@ -36,7 +36,7 @@ export const Chatlist = () => {
                         <div className="w-full overflow-y-auto h-[calc(100%-2rem)] space-y-2 pr-2 bg-gray-900">
                             {Executions.map((execution) => (
                                 <div className="w-full gap-2 p-1" key={execution.id} hidden={showChats}>
-                                    <div className="border-none w-full text-gray-300 p-2 justify-center cursor-pointer hover:bg-gray-700 bg-gray-800  rounded-xl">{execution.title?.substring(0,23)}..</div>
+                                    <div className="border-none w-full text-gray-300 p-2 justify-center cursor-pointer hover:bg-gray-700 bg-gray-800  rounded-xl">{execution.title?.substring(0, 23)}..</div>
                                 </div>
                             ))}
                         </div>

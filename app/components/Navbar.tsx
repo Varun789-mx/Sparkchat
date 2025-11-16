@@ -4,6 +4,8 @@ import { useState } from "react"
 import type { ExecutionType } from "@/types/general";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { useEffect } from "react";
+import { Sparkle } from "lucide-react";
+import type { Message } from "@/types/general";
 import { MODELS } from "@/models/constants"
 import { useSession } from "next-auth/react";
 
@@ -11,6 +13,14 @@ export default function Navbar() {
     const session = useSession();
     const [Executions, setExecutions] = useState<ExecutionType[] | []>([]);
     const [show, setshow] = useState(false);
+    const [messages, setMessages] = useState([
+        {
+            id: 1,
+            role: 'ASSISTANT',
+            content: 'Hello! I\'m your AI assistant. How can I help you today?',
+            timestamp: new Date()
+        }
+    ]);
     const [showChats, setshowchats] = useState(true);
     const [isTyping, setIsTyping] = useState(false);
 
@@ -21,10 +31,9 @@ export default function Navbar() {
     }
         , [])
     const [sidebarOpen, setSidebarOpen] = useState(true);
-    const [isDarkMode, setIsDarkMode] = useState(false);
+    const [isDarkMode, setIsDarkMode] = useState(true);
     return <>
-        <div className="flex h-screen bg-gray-50  text-gray-900">
-
+        <div className="flex h-screen bg-gray-500  text-gray-900">
             <div className={`${sidebarOpen ? "w-80" : "w-0"} ${isDarkMode ? "bg-[#1a1a1a]" : "bg-white"} transition-all duration-300  border-r border-gray-200 flex flex-col overflow-hidden`}>
                 <div className="p-4 border-b border-gray-200">
                     <div className="flex items-center justify-between mb-4">
@@ -43,9 +52,9 @@ export default function Navbar() {
                         New Chat
                     </button>
                 </div>
-                <div className="flex-1 h-[60vhvh] overflow-hidden p-2">
+                <div className="flex-1 h-[60vh] overflow-hidden p-2">
                     <button className="w-full text-gray-500 flex justify-start" onClick={() => setshowchats(!showChats)}>Chats {showChats ? <ChevronRight /> : <ChevronDown />}</button>
-                    <div className={`w-full overflow-y-auto h-[calc(100%-2rem)] space-y-2 pr-2 ${isDarkMode ? "bg-[#1a1a1a]" : "bg-white"}`}>
+                    <div className={`w-full overflow-y-auto h-[calc(100%-2rem)] space-y-2 pr-2 ${isDarkMode ? "bg-[#1a1a1a]" : "bg-white"} `}>
                         {Executions.map((execution) => (
                             <div className="w-full gap-2 p-1" key={execution.id} hidden={showChats}>
                                 <div className={`border-none w-full  p-2 justify-center cursor-pointer hover:bg-gray-700 ${isDarkMode ? "bg-[#1a1a1a] text-gray-300" : "bg-white text-gray-800"} rounded-xl`}>{execution.title?.substring(0, 23)}..</div>
@@ -82,6 +91,34 @@ export default function Navbar() {
                     </div>
                     <div className="flex-1 overflow-y-auto ">
                         {/* chat messages space  */}
+                        <div className="flex-1 overflow-y-auto bg-[#1a1a1a]">
+                            <div className="w-full h-[85vh] flex justify-center bg-[#1a1a1a]">
+                                <div className="w-3/4  flex justify-center items-center">
+                                    {messages.length === 1 && (
+                                        <div className="w-3/4 flex p-3 rounded-xl my-auto justify-center items-center align-middle flex-col bg-neutral-800">
+                                            <div className="p-4 m-2 rounded-full bg-emerald-400">
+                                                <Sparkle className="w-7 h-7 text-white" />
+                                            </div>
+                                            <div className="flex justify-center flex-col items-center">
+                                                <p className="font-bold text-gray-200 text-4xl"> How can i help you today ?</p>
+                                                <p className="text-gray-300 font-sm text-center">Lorem ipsum dolor sit amet consectetur,  labore libero facere mollitia , impedit.</p>
+                                            </div>
+                                            <div className="w-full flex justify-center gap-5 p-3">
+                                                <div className="w-full h-32 p-3 rounded-lg border border-neutral-200 bg-neutral-700 text-center  text-lg text-gray-300 ">
+                                                    <p className="text-lg font-bold  text-white ">Code generation</p>
+                                                    <p className=" align-middle font-light text-neutral-600 ">generate code solve bugs and other styling issues</p></div>
+
+                                                <div className="w-full h-32 p-3 rounded-lg border border-neutral-200 bg-neutral-700 text-center  text-lg text-gray-300 "><p className="text-lg font-bold  text-white ">Text summaraization</p>
+                                                    <p className=" align-middle font-light text-neutral-600">create summaries and understand better</p></div>
+
+                                                <div className="w-full h-32 p-3 rounded-lg border border-neutral-200 bg-neutral-700 text-center  text-lg text-gray-300 "><p className="text-lg font-bold  text-white ">Chat</p>
+                                                    <p className=" align-middle font-light text-neutral-600">Multiple models for better conversation results</p></div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div className={`border-t ${isDarkMode ? 'border-gray-800' : 'border-gray-200'} ${isDarkMode ? 'bg-[#1a1a1a]' : 'bg-white'} p-4`}>
                         <div className="max-w-3xl mx-auto ">
@@ -114,20 +151,19 @@ export default function Navbar() {
     </>
 }
 
-const ModelSelector = () => {
+export const ModelSelector = () => {
     const [selectedmodel, setselectedmodel] = useState("");
     const HandleModelSelect = (e: any) => {
-       localStorage.setItem("modelid", e.target.value);
-       console.log(e.target.value)
-        setselectedmodel(e.target.value)
+        const modelId = e.target.value
+        setselectedmodel(modelId)
+        localStorage.setItem('modelId', modelId);
     }
     return (
-        <select className="bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-lg px-3 py-1.5 text-gray-400  scroll-smooth text-sm font-medium focus:outline-none focus:border-gray-600/50 hover:bg-gray-800/70 transition-all cursor-pointer">
+        <select value={selectedmodel} onChange={HandleModelSelect} className="bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-lg px-3 py-1.5 text-gray-400  scroll-smooth text-sm font-medium focus:outline-none focus:border-gray-600/50 hover:bg-gray-800/70 transition-all cursor-pointer">
             {MODELS.map((opt) => (
                 <option
                     key={opt.id}
                     value={opt.id}
-                    onSelect={HandleModelSelect}
                     className="bg-gray-900 text-gray-500"
                 >
                     {opt.name} {opt.isPremium ? '👑' : ''}

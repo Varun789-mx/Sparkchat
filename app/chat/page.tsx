@@ -14,8 +14,8 @@ export default function Chat() {
     return (
         <div>
             <Chatbox/>
-            {/* <ChatbotInterface conversationId={conversationId} />
-            <Chatlist /> */}
+            {/* <ChatbotInterface conversationId={conversationId} /> */}
+            {/* <Chatlist /> */}
         </div>
 
     )

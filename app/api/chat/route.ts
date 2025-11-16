@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/options";
 import { PrismaClient } from "@prisma/client";
 import { getModelById, MODELS } from "@/models/constants";
-import  { Model, ROLE } from "@/types/general";
+import  { ROLE } from "@/types/general";
 import { InMemoryStore } from "@/lib/InMemoryStore";
 import { GetModelResponse } from "@/lib/GetModelResponse";
 const genai = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API || "");
