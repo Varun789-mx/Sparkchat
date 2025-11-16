@@ -1,5 +1,5 @@
 "use client"
-import { MessageSquare, X, Plus, Sidebar } from "lucide-react";
+import { MessageSquare, X, Plus, Sidebar, ArrowBigRight, Send } from "lucide-react";
 import { useState } from "react"
 import type { ExecutionType } from "@/types/general";
 import { ChevronDown, ChevronRight } from "lucide-react";
@@ -11,6 +11,7 @@ export default function Navbar() {
     const [Executions, setExecutions] = useState<ExecutionType[] | []>([]);
     const [show, setshow] = useState(false);
     const [showChats, setshowchats] = useState(true);
+    const [isTyping, setIsTyping] = useState(false);
 
     useEffect(() => {
         fetch(`http://localhost:3000/api/sidebardata`)
@@ -41,7 +42,7 @@ export default function Navbar() {
                         New Chat
                     </button>
                 </div>
-                <div className="flex-1 h-[70vh] overflow-hidden p-2">
+                <div className="flex-1 h-[60vhvh] overflow-hidden p-2">
                     <button className="w-full text-gray-500 flex justify-start" onClick={() => setshowchats(!showChats)}>Chats {showChats ? <ChevronRight /> : <ChevronDown />}</button>
                     <div className={`w-full overflow-y-auto h-[calc(100%-2rem)] space-y-2 pr-2 ${isDarkMode ? "bg-[#1a1a1a]" : "bg-white"}`}>
                         {Executions.map((execution) => (
@@ -51,6 +52,20 @@ export default function Navbar() {
                         ))}
                     </div>
                 </div>
+                <footer>
+                    <div className={`p-3 border-t border-gray-800`}>
+                        <button className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-gray-800 transition-colors`}>
+                            <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-medium">
+                                {session.data?.user.username?.charAt(0).toUpperCase()}
+                            </div>
+                            <div className="flex-1 text-left ">
+                                <div className={`text-gray-900 font-medium text-sm`}>{session.data?.user.username?.replace("_", " ")}</div>
+                                <div className={`text-gray-500 text-xs`}>Free Plan</div>
+                            </div>
+                            <ChevronDown className={`w-4 h-4 text-gray-500`} />
+                        </button>
+                    </div>
+                </footer>
             </div>
             <div className="pt-2" hidden={sidebarOpen}>
                 <Sidebar onClick={() => setSidebarOpen(!sidebarOpen)} />
@@ -62,21 +77,39 @@ export default function Navbar() {
                 </div>
                 <div className="flex-1 flex flex-col bg-black">
                     {/* for header */}
-                    <div>
+                    <div className="w-full bg-blue-500">
                         {/* for header */}
                     </div>
                     <div className="flex-1 overflow-y-auto ">
                         {/* chat messages space  */}
                     </div>
-                    <div className={`w-full flex justify-center ${isDarkMode ? "bg-[#1a1a1a]" : "bg-white"} p-4`}>
-                        <div className="w-2/3 rounded-lg  flex overflow-y-auto border border-gray-700 pb-3 ">
-                            <textarea className="w-full font-medium outline-none e text-gray-200 overflow-y-auto h-auto scroll-auto scrollbar:hide" />
+                    <div className={`border-t ${isDarkMode ? 'border-gray-800' : 'border-gray-200'} ${isDarkMode ? 'bg-[#1a1a1a]' : 'bg-white'} p-4`}>
+                        <div className="max-w-3xl mx-auto ">
+                            <div className="relative">
+                                <textarea
+                                    // value={input}
+                                    // onChange={(e) => setInput(e.target.value)}
+                                    // onKeyDown={handleKeyPress}
+                                    placeholder="Message SparkAi..."
+                                    rows={1}
+                                    className={`w-full  overflow-y-auto scroll-smooth no-scrollbar ${isDarkMode ? 'bg-[#1a1a1a]' : 'bg-gray-100'} border ${isDarkMode ? 'border-gray-700' : 'border-gray-300'} ${isDarkMode ? 'focus:border-blue-500' : 'focus:border-blue-400'} rounded-xl px-4  py-3 pr-12 ${isDarkMode ? 'text-white' : 'text-gray-900'} placeholder-gray-500 focus:outline-none resize-none transition-colors`}
+                                    style={{ minHeight: '52px', maxHeight: '200px', fieldSizing: 'content' } as React.CSSProperties}
+                                />
+                                <button
+                                    // onClick={handleSend}
+                                    disabled={isTyping}
+                                    className={`absolute right-2 bottom-2 w-8 h-8 m-2 rounded-lg flex items-center align-middle justify-center transition-all ${!isTyping
+                                        ? 'bg-blue-600 hover:bg-blue-700'
+                                        : `${isDarkMode ? 'bg-[#1a1a1a]' : 'bg-gray-100'} cursor-not-allowed`
+                                        }`}
+                                >
+                                    <Send className={`w-4 h-4 ${!isTyping ? 'text-white' : 'text-gray-500'}`} />
+                                </button>
+                            </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
-
     </>
 }
