@@ -1,9 +1,20 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg-primary: #0f0f0f;
+  --bg-secondary: #1a1a1a;
+  --bg-surface: #232323;
+  --border-color: #2e2e2e;
+
+  --text-main: #e5e5e5;
+  --text-secondary: #b5b5b5;
+
+  --accent: #f28b25;
+  --accent-soft: rgba(242, 139, 37, 0.3);
+  --primary-btn: #2563eb;
+  --primary-btn-hover: #1d4ed8;
 }
+
 
 @theme inline {
   --color-background: var(--background);
@@ -17,6 +28,30 @@
     --background: #0a0a0a;
     --foreground: #ededed;
   }
+}
+/* =========================================
+   GLOBAL SCROLLBAR — WORKS ON ALL BROWSERS
+   ========================================= */
+
+/* Chrome, Edge, Safari */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #111;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #444 #111;
 }
 
 body {

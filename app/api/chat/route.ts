@@ -119,6 +119,10 @@ export async function GET(req: Request) {
   }
 
   if (!execution) {
+    const existingConversation = await prisma.conversation.findUnique({
+      where:{id:conversationId}
+    })
+
     await prisma.$transaction([
       prisma.execution.create({
         data: {
@@ -129,11 +133,12 @@ export async function GET(req: Request) {
           externalId: conversationId,
         },
       }),
+      !existingConversation?
       prisma.conversation.create({
         data: {
           id: conversationId,
         },
-      }),
+      }):prisma.$executeRaw`SELECT 1`
     ]);
   }
 
