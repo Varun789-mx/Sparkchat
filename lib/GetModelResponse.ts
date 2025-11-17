@@ -4,7 +4,7 @@ import { MODELS } from "@/models/constants";
 
 export const GetModelResponse = async (
   messages: Message[],
-  model: "x-ai/grok-3-mini",
+  model: string,
   cb: (chunk: string) => void,
   systemprompt?: string,
 ) => {

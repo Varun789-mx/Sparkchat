@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/options";
 import { PrismaClient } from "@prisma/client";
 import { getModelById, MODELS } from "@/models/constants";
-import  { ROLE } from "@/types/general";
+import { ROLE } from "@/types/general";
 import { InMemoryStore } from "@/lib/InMemoryStore";
 import { GetModelResponse } from "@/lib/GetModelResponse";
 const genai = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API || "");
@@ -45,7 +45,7 @@ export async function GET(req: Request) {
   const modelId = searchParams.get("modelId");
   const message = searchParams.get("message");
 
-  if ( !conversationId || !modelId || !message) {
+  if (!conversationId || !modelId || !message) {
     return NextResponse.json(
       {
         message: "Missing required params:",
@@ -69,7 +69,7 @@ export async function GET(req: Request) {
       { status: 401 }
     );
   }
-  const userid =  session.user.id;
+  const userid = session.user.id;
   const Getuser = await prisma.user.findUnique({
     where: {
       id: session.user.id,
@@ -120,7 +120,7 @@ export async function GET(req: Request) {
 
   if (!execution) {
     const existingConversation = await prisma.conversation.findUnique({
-      where:{id:conversationId}
+      where: { id: conversationId }
     })
 
     await prisma.$transaction([
@@ -133,12 +133,12 @@ export async function GET(req: Request) {
           externalId: conversationId,
         },
       }),
-      !existingConversation?
-      prisma.conversation.create({
-        data: {
-          id: conversationId,
-        },
-      }):prisma.$executeRaw`SELECT 1`
+      !existingConversation ?
+        prisma.conversation.create({
+          data: {
+            id: conversationId,
+          },
+        }) : prisma.$executeRaw`SELECT 1`
     ]);
   }
 
@@ -180,7 +180,7 @@ export async function GET(req: Request) {
           }
         );
         InMemoryStore.getInstance().add(conversationId, {
-          role:ROLE.ASSISTANT,
+          role: ROLE.ASSISTANT,
           content: fullresponse,
         });
 
