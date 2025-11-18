@@ -14,8 +14,8 @@ export interface Model {
 }
 
 export enum ROLE {
-  USER = "USER",
-  ASSISTANT = "ASSISTANT",
+  USER = "user",
+  ASSISTANT = "assistant",
 }
 
 export interface ChatSchema {

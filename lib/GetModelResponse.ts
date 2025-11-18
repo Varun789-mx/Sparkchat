@@ -1,12 +1,10 @@
 import type { Message } from "@/types/general";
 const MAX_TOKEN_ITERATONS = 1000;
-import { MODELS } from "@/models/constants";
 
 export const GetModelResponse = async (
   messages: Message[],
   model: string,
   cb: (chunk: string) => void,
-  systemprompt?: string,
 ) => {
   return new Promise<void>(async (resolve, reject) => {
     const response = await fetch(`https://openrouter.ai/api/v1/chat/completions`,
@@ -17,14 +15,13 @@ export const GetModelResponse = async (
           "Content-Type": `application/json`,
         },
         body: JSON.stringify({
-          model: model || "mistralai/mistral-7b-instruct",
+          model: model || "google/gemini-2.5-flash",
           messages: messages,
           stream: true,
-          system: systemprompt,
+          max_tokens:4096
         }),
       });
-
-
+      console.log(response)
     const reader = response.body?.getReader();
     if (!reader) {
       throw new Error("Response body is not readable");
@@ -66,6 +63,7 @@ export const GetModelResponse = async (
               const content = parsed.choices?.[0]?.delta?.content;
               if (content) {
                 cb(content);
+                console.log(content,"From get model respons");
               }
             } catch (e) {
               console.log("Failed to parse SSE data", data, e);

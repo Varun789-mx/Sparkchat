@@ -142,55 +142,55 @@ async function main() {
       messages: {
         create: [
           {
-            role: 'USER',
+            role: 'user',
             content: 'Hello! Can you help me with Next.js?',
           },
           {
-            role: 'ASSISTANT',
+            role: 'assistant',
             content: 'Of course! I\'d be happy to help you with Next.js. What would you like to know?',
           },
           {
-            role: 'USER',
+            role: 'user',
             content: 'How do I set up server components?',
           },
           {
-            role: 'USER',
+            role: 'user',
             content: 'How do I set up server components?',
           },
           {
-            role: 'USER',
+            role: 'user',
             content: 'How do I set up server components?',
           },
           {
-            role: 'USER',
+            role: 'user',
             content: 'How do I set up server components?',
           },
           {
-            role: 'USER',
+            role: 'user',
             content: 'How do I set up server components?',
           },
           {
-            role: 'USER',
+            role: 'user',
             content: 'How do I set up server components?',
           },
           {
-            role: 'USER',
+            role: 'user',
             content: 'How do I set up server components?',
           },
           {
-            role: 'USER',
+            role: 'user',
             content: 'How do I set up server components?',
           },
           {
-            role: 'USER',
+            role: 'user',
             content: 'How do I set up server components?',
           },
           {
-            role: 'USER',
+            role: 'user',
             content: 'How do I set up server components?',
           },
           {
-            role: 'ASSISTANT',
+            role: 'assistant',
             content: 'Server Components are the default in Next.js 13+. Just create components without "use client" directive.',
           },
         ],
@@ -203,11 +203,11 @@ async function main() {
       messages: {
         create: [
           {
-            role: 'USER',
+            role: 'user',
             content: 'Tell me about TypeScript',
           },
           {
-            role: 'ASSISTANT',
+            role: 'assistant',
             content: 'TypeScript is a strongly typed programming language that builds on JavaScript.',
           },
         ],

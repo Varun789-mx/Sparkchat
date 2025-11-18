@@ -18,32 +18,28 @@ const model = genai.getGenerativeModel({
   ],
 });
 
+// export async function POST(req: Request) {
+//   const { prompt } = await req.json();
+//   try {
+//     const result = await model.generateContent(prompt);
+
+//     return new Response(
+//       JSON.stringify({
+//         summary: result.response.text(),
+//       })
+//     );
+//   } catch (error: any) {
+//     return NextResponse.json(
+//       { message: error.message || "Something went wrong" },
+//       { status: 400 }
+//     );
+//   }
+// }
+
 export async function POST(req: Request) {
-  const { prompt } = await req.json();
-  try {
-    const result = await model.generateContent(prompt);
-
-    return new Response(
-      JSON.stringify({
-        summary: result.response.text(),
-      })
-    );
-  } catch (error: any) {
-    return NextResponse.json(
-      { message: error.message || "Something went wrong" },
-      { status: 400 }
-    );
-  }
-}
-
-export async function GET(req: Request) {
   const session = await getServerSession(authOptions);
   const prisma = new PrismaClient();
-
-  const { searchParams } = new URL(req.url);
-  const conversationId = searchParams.get("conversationId");
-  const modelId = searchParams.get("modelId");
-  const message = searchParams.get("message");
+  const { conversationId, modelId, message } = await req.json();
 
   if (!conversationId || !modelId || !message) {
     return NextResponse.json(
@@ -183,18 +179,17 @@ export async function GET(req: Request) {
           role: ROLE.ASSISTANT,
           content: fullresponse,
         });
-
         await prisma.$transaction([
           prisma.message.createMany({
             data: [
               {
-                conversationId,
-                role: ROLE.USER,
+                conversationId:conversationId,
+                role: "user",
                 content: message,
               },
               {
-                conversationId,
-                role: ROLE.ASSISTANT,
+                conversationId:conversationId,
+                role: "assistant",
                 content: fullresponse,
               },
             ],
@@ -219,9 +214,10 @@ export async function GET(req: Request) {
   });
   return new Response(stream, {
     headers: {
-      "Content-Type": "text/event-stream",
-      "Cache-Control": "no-cache",
-      Connection: "keep-alive",
+      "Content-Type": "text/event-stream; charset=utf-8",
+    "Cache-Control": "no-cache, no-transform",
+    "Connection": "keep-alive",
+    "Transfer-Encoding": "chunked",
     },
   });
 }

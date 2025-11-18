@@ -40,8 +40,8 @@ enum ExecutionType {
 }
 
 enum ROLE {
-  USER
-  ASSISTANT
+  user
+  assistant
 }
 
 model Conversation {
