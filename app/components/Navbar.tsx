@@ -1,5 +1,5 @@
 "use client"
-import { MessageSquare, X, Plus, Sidebar, Send, ChevronLeft } from "lucide-react";
+import { MessageSquare, X, Plus, Sidebar, Send, ChevronLeft, Bot } from "lucide-react";
 import { useState } from "react"
 import type { ExecutionType } from "@/types/general";
 import { ChevronDown, ChevronRight } from "lucide-react";
@@ -7,91 +7,15 @@ import { useEffect } from "react";
 import { Sparkle } from "lucide-react";
 import { MODELS } from "@/models/constants"
 import { useSession } from "next-auth/react";
+import { Assistant } from "next/font/google";
+import { isAssistantMessage } from "openai/lib/chatCompletionUtils.mjs";
+import { timeStamp } from "console";
 
 export default function Navbar() {
     const session = useSession();
     const [Executions, setExecutions] = useState<ExecutionType[] | []>([]);
     const [showChats, setshowchats] = useState(true);
     const [isTyping, setIsTyping] = useState(false);
-    const [userinput, setuserinput] = useState({
-        conversationId: "",
-        modelId: "",
-        message: "",
-    })
-    
-    const Handlesend = async() => {
-        if(!userinput.message.trim()) return;
-        const model = localStorage.getItem('modelId') || 'google/gemini-2.5-flash';
-        let conversationId = localStorage.getItem('conversationId') || "";
-        if(!conversationId) { 
-            conversationId = crypto.randomUUID();
-            localStorage.setItem('conversationId',conversationId);
-        }
-        setuserinput(prev => ({
-            ...prev,
-            modelId: model,
-            conversationId: conversationId,
-        }))
-        try { 
-       const response =  await fetch(`http://localhost:3000/api/chat`,{
-            method:'POST',
-            headers:{
-            'Content-Type':'application/json',
-            },
-            body:JSON.stringify({
-                conversationId:conversationId,
-                modelId:model,
-                message:userinput.message
-            })
-        })
-        const reader = response.body?.getReader();
-        const decoder = new TextDecoder();
-
-       if (reader) {
-    let assistantMessage = '';
-    
-    while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        
-        const chunk = decoder.decode(value);
-        const lines = chunk.split('\n');
-        
-        for (const line of lines) {
-            if (line.startsWith('data: ')) {
-                const data = line.slice(6);
-                
-                if (data === '[DONE]') {
-                    console.log('Stream complete!');
-                    break;
-                }
-                
-                try {
-                    const parsed = JSON.parse(data);
-                    console.log('Chunk received:', parsed.content); // See each chunk
-                    assistantMessage += parsed.content;
-                    
-                } catch (e) {
-                    console.error('Parse error:', e, 'Line:', line);
-                }
-            }
-        }
-    }
-    
-    console.log('Full response length:', assistantMessage.length);
-    console.log('Full response:', assistantMessage);
-}
-    } catch (error) {
-        console.error('Fetch error:', error);
-    }
-
-    }
-    const Handlekeypress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if (e.key == 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            Handlesend();
-        }
-    }
     const [messages, setMessages] = useState([
         {
             id: 1,
@@ -100,6 +24,116 @@ export default function Navbar() {
             timestamp: new Date()
         }
     ]);
+    const [userinput, setuserinput] = useState({
+        conversationId: "",
+        modelId: "",
+        message: "",
+    })
+
+    const Handlesend = async () => {
+        if (!userinput.message.trim()) return;
+        const model = localStorage.getItem('modelId') || 'google/gemini-2.5-flash';
+        let conversationId = localStorage.getItem('conversationId') || "";
+        if (!conversationId) {
+            conversationId = crypto.randomUUID();
+            localStorage.setItem('conversationId', conversationId);
+        }
+        setuserinput(prev => ({
+            ...prev,
+            modelId: model,
+            conversationId: conversationId,
+        }))
+        const userMessage = {
+            id: messages.length + 1,
+            role: "user",
+            content: userinput.message,
+            timestamp: new Date(),
+        }
+        setMessages(prev => [...prev, userMessage]);
+
+        const currentMessage = userinput.message;
+        setuserinput(prev => ({
+            ...prev,
+            message: "",
+            modelId: model,
+            conversationId: conversationId
+        }))
+        const assistantMessageId = messages.length + 2;
+        setMessages(prev => [...prev, {
+            id: assistantMessageId,
+            role: 'assistant',
+            content: "",
+            timestamp: new Date()
+        }])
+        try {
+            const response = await fetch(`http://localhost:3000/api/chat`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    conversationId: conversationId,
+                    modelId: model,
+                    message: userinput.message
+                })
+            })
+            const reader = response.body?.getReader();
+            const decoder = new TextDecoder();
+
+            if (reader) {
+                let assistantMessage = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    const chunk = decoder.decode(value);
+                    const lines = chunk.split('\n');
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const data = line.slice(6);
+
+                            if (data === '[DONE]') {
+                                console.log('Stream complete!');
+                                break;
+                            }
+
+                            try {
+                                const parsed = JSON.parse(data);
+                                console.log('Chunk received:', parsed.content); // See each chunk
+                                assistantMessage += parsed.content;
+                                setMessages(prev => prev.map(msg =>
+                                    msg.id === assistantMessageId ?
+                                        { ...msg, content: assistantMessage } : msg
+                                ));
+
+                            } catch (e) {
+                                console.error('Parse error:', e, 'Line:', line);
+                            }
+                        }
+                    }
+                }
+                console.log('Full response length:', assistantMessage.length);
+                console.log('Full response:', assistantMessage);
+            }
+        } catch (error) {
+            console.error('Fetch error:', error);
+            setMessages(prev => prev.map(msg =>
+                msg.id === assistantMessageId ?
+                    { ...msg, content: "Sorry an error occured" } : msg
+            ))
+        }
+
+
+    }
+    const Handlekeypress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key == 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            Handlesend();
+        }
+    }
+
 
 
     useEffect(() => {
@@ -158,7 +192,7 @@ export default function Navbar() {
 
             <div className="flex-1 flex flex-col">
 
-                <div className="flex-1 flex flex-col">
+                <div className="flex-1 flex flex-col h-full ">
                     {/* for header */}
                     <div className={`w-full gap-4 ${isDarkMode ? "bg-[#181818]" : "bg-white"} flex justify-start p-4`}>
                         {sidebarOpen ? <ChevronLeft className="text-gray-200" /> : <Sidebar onClick={() => setSidebarOpen(!sidebarOpen)} />}
@@ -167,7 +201,7 @@ export default function Navbar() {
                     </div>
                     <div className="flex-1 overflow-y-auto  flex justify-center  items-center  align-middle bg-[#181818]">
                         {/* chat messages space  */}
-                        <div className="flex-1 overflow-y-auto flex items-center justify-center">
+                        <div className="flex-1 overflow-y-auto flex justify-center items-center ">
 
                             <div className="w-3/4  flex justify-center items-center align-middle">
                                 {messages.length === 1 && (
@@ -193,10 +227,29 @@ export default function Navbar() {
                                     </div>
                                 )}
                             </div>
-
-
                         </div>
                     </div>
+                    {messages.length > 1 && (
+                        messages.map((msg) => (
+                            <div key={msg.id} className="w-full flex h-1/3 align-top  gap-2 bg-emerald-500">
+                                <div className="w-1/5 p-2 flex justify-start gap-2 bg-blue-500">
+                                    {msg.role === 'user' ? (
+                                        <div className="w-full flex mx-20 items-start gap-2">
+                                            <div className="rounded-full w-8 h-8 p-4 bg-gray-500 flex items-center justify-center text-white text-sm font-medium">
+                                                {session.data?.user.username?.charAt(0).toUpperCase()}
+                                            </div>
+                                            <div className="text-gray-200">{msg.content}</div>
+                                        </div>) : (<div className="flex items-start gap-2">
+                                            <div><Bot /></div>
+                                            <div className="text-gray-200">{msg.content}</div>
+                                        </div>
+                                    )
+                                    }
+                                </div>
+                            </div>
+                        ))
+                    )}
+
                     <div className={`w-full overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 scroll-smooth rounded-xl px-4 py-3 pr-12 resize-none`}>
                         <div className="max-w-3xl mx-auto">
                             <div className="relative overflow-hidden">
