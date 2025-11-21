@@ -1,35 +1,46 @@
 "use client"
 import { MessageSquare, X, Plus, Sidebar, Send, ChevronLeft, Bot } from "lucide-react";
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import type { ExecutionType } from "@/types/general";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { useEffect } from "react";
 import { Sparkle } from "lucide-react";
 import { MODELS } from "@/models/constants"
 import { useSession } from "next-auth/react";
-import { Assistant } from "next/font/google";
-import { isAssistantMessage } from "openai/lib/chatCompletionUtils.mjs";
-import { timeStamp } from "console";
+import LLMResponseParser from "./llmparser";
+
+
+
+interface Messagefields {
+    id: number,
+    role: string,
+    content: string,
+    timestamp: Date
+}
 
 export default function Navbar() {
     const session = useSession();
     const [Executions, setExecutions] = useState<ExecutionType[] | []>([]);
     const [showChats, setshowchats] = useState(true);
     const [isTyping, setIsTyping] = useState(false);
-    const [messages, setMessages] = useState([
-        {
-            id: 1,
-            role: 'ASSISTANT',
-            content: 'Hello! I\'m your AI assistant. How can I help you today?',
-            timestamp: new Date()
-        }
-    ]);
+    const [copied, setcopied] = useState(false);
+    const [messages, setMessages] = useState<Messagefields[]>([]);
     const [userinput, setuserinput] = useState({
         conversationId: "",
         modelId: "",
         message: "",
     })
-
+    const HandleCopy = useCallback(async (content: string) => {
+        try {
+            await navigator.clipboard.writeText(content);
+            setcopied(true);
+            setTimeout(() => {
+                setcopied(false)
+            }, 2000);
+        } catch (err) {
+            console.log("Failed to copy ", err);
+        }
+    }, [])
     const Handlesend = async () => {
         if (!userinput.message.trim()) return;
         const model = localStorage.getItem('modelId') || 'google/gemini-2.5-flash';
@@ -134,6 +145,10 @@ export default function Navbar() {
         }
     }
 
+    useEffect(() => {
+        const container = document.querySelector(".message-container");
+        if (container) container.scrollTop = container.scrollHeight;
+    }, [messages])
 
 
     useEffect(() => {
@@ -201,10 +216,9 @@ export default function Navbar() {
                     </div>
                     <div className="flex-1 overflow-y-auto  flex justify-center  items-center  align-middle bg-[#181818]">
                         {/* chat messages space  */}
-                        <div className="flex-1 overflow-y-auto flex justify-center items-center ">
-
-                            <div className="w-3/4  flex justify-center items-center align-middle">
-                                {messages.length === 1 && (
+                        <div className="flex-1 overflow-y-auto flex flex-col items-center py-6">
+                            <div className="w-3/4 flex flex-col space-y-4">
+                                {messages.length === 0 ? (
                                     <div className="w-3/4 flex p-3 rounded-xl my-auto justify-center items-center  flex-col bg-neutral-800">
                                         <div className="p-4 m-2 rounded-full bg-emerald-400">
                                             <Sparkle className="w-7 h-7 text-white" />
@@ -225,31 +239,22 @@ export default function Navbar() {
                                                 <p className=" align-middle font-light text-sm text-orange-300">Multiple models for better conversation results</p></div>
                                         </div>
                                     </div>
-                                )}
+                                ) : (<div className="w-full flex p-2 flex-col space-y-4">
+
+                                    {messages.map((msg) => (
+                                        <div key={msg.id} className={`flex w-full ${msg.role === 'user' ? "justify-end" : "justify-start"}   `}>
+                                            <div className="message-container  p-2  flex flex-col justify-start gap-2 overflow-y-auto  scroll-auto ">
+                                                <div className={`w-[80%] p-3 flex justify-center  rounded-xl ${msg.role === 'user' ? "bg-blue-600  text-white" : "bg-neutral-700 text-gray-200"}`}>
+                                                    <LLMResponseParser content={msg.content} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))
+                                    }
+                                </div>)}
                             </div>
                         </div>
                     </div>
-                    {messages.length > 1 && (
-                        messages.map((msg) => (
-                            <div key={msg.id} className="w-full flex h-1/3 align-top  gap-2 bg-emerald-500">
-                                <div className="w-1/5 p-2 flex justify-start gap-2 bg-blue-500">
-                                    {msg.role === 'user' ? (
-                                        <div className="w-full flex mx-20 items-start gap-2">
-                                            <div className="rounded-full w-8 h-8 p-4 bg-gray-500 flex items-center justify-center text-white text-sm font-medium">
-                                                {session.data?.user.username?.charAt(0).toUpperCase()}
-                                            </div>
-                                            <div className="text-gray-200">{msg.content}</div>
-                                        </div>) : (<div className="flex items-start gap-2">
-                                            <div><Bot /></div>
-                                            <div className="text-gray-200">{msg.content}</div>
-                                        </div>
-                                    )
-                                    }
-                                </div>
-                            </div>
-                        ))
-                    )}
-
                     <div className={`w-full overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 scroll-smooth rounded-xl px-4 py-3 pr-12 resize-none`}>
                         <div className="max-w-3xl mx-auto">
                             <div className="relative overflow-hidden">

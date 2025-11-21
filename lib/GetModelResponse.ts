@@ -1,4 +1,5 @@
 import type { Message } from "@/types/general";
+import systemPrompt from "./systemprompt";
 const MAX_TOKEN_ITERATONS = 1000;
 
 export const GetModelResponse = async (
@@ -16,12 +17,14 @@ export const GetModelResponse = async (
         },
         body: JSON.stringify({
           model: model || "google/gemini-2.5-flash",
-          messages: messages,
+          messages: [{ role: 'system', content: systemPrompt },
+          ...messages
+          ],
           stream: true,
-          max_tokens:4096
+          max_tokens: 4096
         }),
       });
-      console.log(response)
+    console.log(response)
     const reader = response.body?.getReader();
     if (!reader) {
       throw new Error("Response body is not readable");
@@ -63,7 +66,7 @@ export const GetModelResponse = async (
               const content = parsed.choices?.[0]?.delta?.content;
               if (content) {
                 cb(content);
-                console.log(content,"From get model respons");
+                console.log(content, "From get model respons");
               }
             } catch (e) {
               console.log("Failed to parse SSE data", data, e);
