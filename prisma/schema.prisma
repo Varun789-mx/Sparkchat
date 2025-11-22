@@ -11,15 +11,17 @@ datasource db {
 }
 
 model User {
-  id         String      @id @default(uuid())
-  username   String
-  email      String      @unique
-  credits    Int         @default(3)
-  password   String
-  isPremium  Boolean     @default(false)
-  createdAt  DateTime    @default(now())
-  executions Execution[]
-  updatedAt  DateTime    @updatedAt
+  id            String         @id @default(uuid())
+  username      String
+  email         String         @unique
+  credits       Int            @default(3)
+  password      String
+  isPremium     Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+  executions    Execution[]
+  conversations Conversation[]
+  updatedAt     DateTime       @updatedAt
+  apps          App[]
 }
 
 model Execution {
@@ -46,20 +48,25 @@ enum ROLE {
 
 model Conversation {
   id        String    @id @default(uuid())
+  user      User      @relation(fields: [userId], references: [id])
+  userId    String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   messages  Message[]
+  apps      App[]
 }
 
 model App {
-  id          String @id @default(uuid())
-  name        String
-  description String
-  icon        String
-
+  id             String       @id @default(uuid())
+  name           String
+  description    String
+  icon           String
+  user           User         @relation(fields: [userId], references: [id])
+  userId         String
   conversationId String
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 }
 
 model Message {

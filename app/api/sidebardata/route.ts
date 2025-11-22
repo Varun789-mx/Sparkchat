@@ -13,12 +13,11 @@ export async function GET() {
         }, { status: 401 })
     }
     try {
-        const Getdata = await prisma.execution.findMany({
+        const Getdata = await prisma.conversation.findMany({
             where: {
                 userId: session.user.id
             }, select: {
-                id: true,
-                title: true
+                messages: true,
             }
         })
         if (Getdata.length === 0) {
@@ -32,6 +31,6 @@ export async function GET() {
     } catch (error: any) {
         return NextResponse.json({
             message: `Internal server error ${error.message}`
-        },{status:500})
+        }, { status: 500 })
     }
 }

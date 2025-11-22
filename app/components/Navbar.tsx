@@ -10,7 +10,7 @@ import {
   Copy,
 } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
-import type { ExecutionType } from "@/types/general";
+import type { Message, Messages } from "@/types/general";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { useEffect } from "react";
 import { Sparkle } from "lucide-react";
@@ -25,10 +25,12 @@ interface Messagefields {
   content: string;
   timestamp: Date;
 }
-
+interface conversationsProp {
+  messages: Messagefields[]
+}
 export default function Navbar() {
   const session = useSession();
-  const [Executions, setExecutions] = useState<ExecutionType[] | []>([]);
+  const [Executions, setExecutions] = useState<conversationsProp[]>([]);
   const [showChats, setshowchats] = useState(true);
   const [isTyping, setIsTyping] = useState(false);
   const [copied, setcopied] = useState(false);
@@ -179,6 +181,8 @@ export default function Navbar() {
       .then((res) => res.json())
       .then((data) => setExecutions(data.data))
       .catch((error) => console.log(error));
+
+    console.log(Executions);
   }, []);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(true);
@@ -186,11 +190,9 @@ export default function Navbar() {
     <>
       <div className="flex h-screen bg-[#111111]  text-gray-200">
         <div
-          className={`${sidebarOpen ? "w-80" : "w-0"} ${
-            isDarkMode ? "bg-[#181818]" : "bg-white"
-          } transition-all duration-300 overflow-hidden flex flex-col border-r ${
-            isDarkMode ? "border-gray-800" : "border-gray-200"
-          }`}
+          className={`${sidebarOpen ? "w-80" : "w-0"} ${isDarkMode ? "bg-[#181818]" : "bg-white"
+            } transition-all duration-300 overflow-hidden flex flex-col border-r ${isDarkMode ? "border-gray-800" : "border-gray-200"
+            }`}
         >
           <div className="p-4 border-b border-gray-800">
             <div className="flex items-center justify-between mb-4">
@@ -218,27 +220,29 @@ export default function Navbar() {
               Chats {showChats ? <ChevronRight /> : <ChevronDown />}
             </button>
             <div
-              className={`w-full overflow-y-auto h-[calc(100%-2rem)] space-y-2 pr-2 ${
-                isDarkMode ? "bg-[#181818]" : "bg-white"
-              } `}
+              className={`w-full overflow-y-auto h-[calc(100%-2rem)] space-y-2 pr-2 ${isDarkMode ? "bg-[#181818]" : "bg-white"
+                } `}
             >
-              {Executions.map((execution) => (
-                <div
-                  className="w-full gap-2 p-1"
-                  key={execution.id}
-                  hidden={!showChats}
-                >
+              {Executions.length ? Executions.map((execution, index) => {
+
+                const firstUserMessage = execution.messages.find((msg) => msg.role === 'user')
+                return (
                   <div
-                    className={`border-none w-full  p-2 justify-center cursor-pointer hover:bg-gray-700 ${
-                      isDarkMode
+                    className="w-full gap-2 p-1"
+                    key={index}
+                    hidden={!showChats}
+                  >
+                    <div
+                      className={`border-none w-full  p-2 justify-center cursor-pointer hover:bg-gray-700 ${isDarkMode
                         ? "bg-[#181818] text-gray-300"
                         : "bg-white text-gray-800"
-                    } rounded-xl`}
-                  >
-                    {execution.title?.substring(0, 23)}..
+                        } rounded-xl`}
+                    >
+                      {firstUserMessage?.content?.substring(0, 23) || "New Conversation"}..
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              }) : <p className="text-gray-500 text-center mt-4 ">No conversations yet</p>}
             </div>
           </div>
           <footer>
@@ -265,9 +269,8 @@ export default function Navbar() {
           <div className="flex-1 flex flex-col h-full ">
             {/* for header */}
             <div
-              className={`w-full gap-4 ${
-                isDarkMode ? "bg-[#181818]" : "bg-white"
-              } flex justify-start p-4`}
+              className={`w-full gap-4 ${isDarkMode ? "bg-[#181818]" : "bg-white"
+                } flex justify-start p-4`}
             >
               {sidebarOpen ? (
                 <ChevronLeft className="text-gray-200" />
@@ -336,19 +339,17 @@ export default function Navbar() {
                       {messages.map((msg) => (
                         <div
                           key={msg.id}
-                          className={`flex w-full ${
-                            msg.role === "user"
-                              ? "justify-end"
-                              : "justify-start"
-                          }`}
+                          className={`flex w-full ${msg.role === "user"
+                            ? "justify-end"
+                            : "justify-start"
+                            }`}
                         >
                           <div className="message-container  p-2  flex flex-col justify-start gap-2 overflow-y-auto  scroll-auto ">
                             <div
-                              className={`w-[80%] p-3 flex justify-center  rounded-xl ${
-                                msg.role === "user"
-                                  ? "bg-blue-600  text-white"
-                                  : "bg-neutral-700 text-gray-200"
-                              }`}
+                              className={`w-[80%] p-3 flex justify-center  rounded-xl ${msg.role === "user"
+                                ? "bg-blue-600  text-white"
+                                : "bg-neutral-700 text-gray-200"
+                                }`}
                             >
                               <div className="w-full overflow-y-auto scroll-auto ">
                                 <ReactMarkDown components={markDownComponent}>
@@ -377,17 +378,13 @@ export default function Navbar() {
                     onKeyDown={Handlekeypress}
                     placeholder="Message SparkAi..."
                     rows={1}
-                    className={`w-full  overflow-y-auto scroll-smooth crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 no-scrollbar-firefox-firefox-firefox-firefox-firefox-firefox-firefox-firefox ${
-                      isDarkMode ? "bg-[#181818]" : "bg-gray-100"
-                    } border ${
-                      isDarkMode ? "border-gray-700" : "border-gray-300"
-                    } ${
-                      isDarkMode
+                    className={`w-full  overflow-y-auto scroll-smooth crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 no-scrollbar-firefox-firefox-firefox-firefox-firefox-firefox-firefox-firefox ${isDarkMode ? "bg-[#181818]" : "bg-gray-100"
+                      } border ${isDarkMode ? "border-gray-700" : "border-gray-300"
+                      } ${isDarkMode
                         ? "focus:border-blue-500"
                         : "focus:border-blue-400"
-                    } rounded-xl px-4  py-3 pr-12 ${
-                      isDarkMode ? "text-white" : "text-gray-200"
-                    } placeholder-gray-500 focus:outline-none resize-none transition-colors`}
+                      } rounded-xl px-4  py-3 pr-12 ${isDarkMode ? "text-white" : "text-gray-200"
+                      } placeholder-gray-500 focus:outline-none resize-none transition-colors`}
                     style={
                       {
                         minHeight: "52px",
@@ -399,18 +396,15 @@ export default function Navbar() {
                   <button
                     onClick={Handlesend}
                     disabled={isTyping}
-                    className={`absolute right-2 bottom-2 w-8 h-8 m-2 rounded-lg flex items-center align-middle justify-center transition-all ${
-                      !isTyping
-                        ? "bg-orange-500 hover:bg-orange-700"
-                        : `${
-                            isDarkMode ? "bg-[#181818]" : "bg-gray-100"
-                          } cursor-not-allowed`
-                    }`}
+                    className={`absolute right-2 bottom-2 w-8 h-8 m-2 rounded-lg flex items-center align-middle justify-center transition-all ${!isTyping
+                      ? "bg-orange-500 hover:bg-orange-700"
+                      : `${isDarkMode ? "bg-[#181818]" : "bg-gray-100"
+                      } cursor-not-allowed`
+                      }`}
                   >
                     <Send
-                      className={`w-4 h-4 ${
-                        !isTyping ? "text-white" : "text-gray-500"
-                      }`}
+                      className={`w-4 h-4 ${!isTyping ? "text-white" : "text-gray-500"
+                        }`}
                     />
                   </button>
                 </div>
