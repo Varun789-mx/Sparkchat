@@ -1,29 +1,49 @@
 "use client";
 
-import React, { Fragment, useMemo } from "react";
+import React, { Children, createElement, Fragment, useMemo } from "react";
 import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
 import remarkRehype from "remark-rehype";
 import rehypeReact from "rehype-react";
+import ReactMarkdown from "react-markdown";
 
 interface Props {
   content: string;
 }
 
-const CodeBlock = ({ children }: any) => {
+const CodeBlock = ({ children, language }: any) => {
   const code =
     typeof children === "string"
       ? children
-      : (Array.isArray(children) ? children.join("") : children?.[0] || "");
+      : Array.isArray(children)
+      ? children.join("")
+      : children?.[0] || "";
 
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(code);
-    } catch (err) {
-      console.warn("Copy failed", err);
-    }
-  };
+  return (
+    <div>
+      <pre className="bg-black text-gray-400 p-3 rounded-md overflow-auto text-sm">
+        <code className={language ? "language-${language}" : ""}>{code}</code>
+      </pre>
+    </div>
+  );
+};
+
+
+const processor = unified()
+  .use(remarkParse)
+  .use(remarkGfm)
+  .use(remarkRehype)
+  .use(rehypeReact, {
+    createElement: React.createElement,
+    Fragment,
+    components: {
+      pre: CodeBlock, // 🔥 Override fenced code blocks
+    },
+  });
+
+
+const handleCopy = ()=> {
 
   return (
     <div className="relative group my-3">
@@ -40,17 +60,9 @@ const CodeBlock = ({ children }: any) => {
   );
 };
 
-const processor = unified()
-  .use(remarkParse)
-  .use(remarkGfm)
-  .use(remarkRehype)
-  .use(rehypeReact, {
-    createElement: React.createElement,
-    Fragment,
-    components: {
-      pre: CodeBlock, // 🔥 Override fenced code blocks
-    },
-  });
+
+
+
 
 export default function LLMResponseParser({ content }: Props) {
   const sanitizedContent = content?.replace(/\u0000/g, "") ?? "";
