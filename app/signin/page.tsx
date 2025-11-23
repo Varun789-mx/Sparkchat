@@ -76,10 +76,10 @@ return (
             {/* Main Form */}
              <div className="flex  md:w-4/5 items-center  justify-center bg-gray-900 space-y-2.5">
             <div className="min-w-sm   flex flex-col justify-center lg:w">
-                <div className="w-full justify-center align-top"> {success && (
+                <div className="w-full justify-center align-top"> {loading && (
                             <div className="mt-4 p-3 bg-green-900/50 border border-green-500 rounded-lg flex items-start gap-2 animate-pulse">
                                 <CheckCircle className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
-                                <p className="text-sm text-green-200">
+                             <p className="text-sm text-green-200">
                                      Signing you in...
                                 </p>
                             </div>

@@ -2,7 +2,6 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/options";
 import { NextResponse } from "next/server";
 import {prisma} from "@/lib/prisma"
-import { withAccelerate } from "@prisma/extension-accelerate";
 
 export async function GET() {
    
@@ -32,11 +31,6 @@ export async function GET() {
             },
             orderBy: {
                 updatedAt: 'desc'
-            }
-        }).withAccelerate({
-            cacheStrategy: {
-                ttl: 60,  // Cache for 60 seconds
-                swr: 120  // Serve stale data for 120 seconds while revalidating
             }
         })
         if (Getdata.length === 0) {

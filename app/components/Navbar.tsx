@@ -8,6 +8,7 @@ import {
   ChevronLeft,
   Bot,
   Copy,
+  TypeIcon,
 } from "lucide-react";
 
 import { useCallback, useRef, useState } from "react";
@@ -38,6 +39,7 @@ export default function Navbar() {
   const [showChats, setshowchats] = useState(true);
   const [isTyping, setIsTyping] = useState(false);
   const [copied, setcopied] = useState(false);
+  const [loading, setloading] = useState(false);
   const chatcontainerRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<Messagefields[]>([]);
   const { preprocessMarkdown, markDownComponent } = useMarkdown();
@@ -48,12 +50,14 @@ export default function Navbar() {
     message: "",
   });
 
-  const HandleConversationId = () => {
-    const localId = localStorage.getItem("conversationId");
-    if (!localId) {
-      setconversationId(crypto.randomUUID());
+  useEffect(() => {
+    const existingId = localStorage.getItem("conversationId");
+    if (!existingId) {
+      const newId = crypto.randomUUID();
+      setconversationId(newId);
+      localStorage.setItem("conversationId", newId)
     }
-  }
+  }, [])
   const HandleCopy = useCallback(async (content: string) => {
     try {
       await navigator.clipboard.writeText(content);
@@ -104,6 +108,8 @@ export default function Navbar() {
       },
     ]);
     try {
+      setIsTyping(true);
+      setloading(true);
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chat`, {
         method: "POST",
         headers: {
@@ -112,7 +118,7 @@ export default function Navbar() {
         body: JSON.stringify({
           conversationId: conversationId,
           modelId: model,
-          message: userinput.message,
+          message: currentMessage,
         }),
       });
       const reader = response.body?.getReader();
@@ -138,6 +144,8 @@ export default function Navbar() {
               }
 
               try {
+                setloading(false);
+                setIsTyping(false);
                 const parsed = JSON.parse(data);
                 console.log("Chunk received:", parsed.content); // See each chunk
                 assistantMessage += parsed.content;
@@ -154,8 +162,6 @@ export default function Navbar() {
             }
           }
         }
-        console.log("Full response length:", assistantMessage.length);
-        console.log("Full response:", assistantMessage);
       }
     } catch (error) {
       console.error("Fetch error:", error);
@@ -191,6 +197,10 @@ export default function Navbar() {
     }
   }
   useEffect(() => {
+    fetchConversations(conversationId);
+    Handlesend();
+  }, [])
+  useEffect(() => {
     const container = chatcontainerRef.current;
     if (container) {
       const isnearBottom =
@@ -204,7 +214,7 @@ export default function Navbar() {
   }, [messages]);
 
   useEffect(() => {
-    fetch(`http://localhost:3000/api/sidebardata`)
+    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sidebardata`)
       .then((res) => res.json())
       .then((data) => setExecutions(data.data))
       .catch((error) => console.log(error));
@@ -250,7 +260,7 @@ export default function Navbar() {
               className={`w-full overflow-y-auto h-[calc(100%-2rem)] space-y-2 pr-2 ${isDarkMode ? "bg-[#181818]" : "bg-white"
                 } `}
             >
-              {Executions.length ? Executions.map((execution, index) => {
+              {Executions ? Executions.map((execution, index) => {
 
                 const firstUserMessage = execution.messages.find((msg) => msg.role === 'user')
                 return (
@@ -294,7 +304,7 @@ export default function Navbar() {
                   <div className={`text-gray-200 font-medium text-sm`}>
                     {session.data?.user.username?.replace("_", " ")}
                   </div>
-                  <div className={`text-gray-500 text-xs`}>Free Plan</div>
+                  <div className={`text-gray-500 text-xs flex justify-start gap-4  `}>Free Plan <p>Credits: {session.data?.user.credits?.toString()}</p></div>
                 </div>
                 <ChevronDown className={`w-4 h-4 text-gray-500`} />
               </button>
@@ -322,13 +332,13 @@ export default function Navbar() {
               </p>
               <ModelSelector />
             </div>
-            <div className="flex-1 flex flex-col overflow-hidden align-middle bg-[#181818]">
+            <div className="flex-1 flex flex-col overflow-hidden align-middle bg-black">
               {/* chat messages space  */}
               <div
                 ref={chatcontainerRef}
-                className="flex flex-1 overflow-y-auto flex-col items-center py-6"
+                className="flex flex-1 overflow-y-auto  flex-col items-center py-6"
               >
-                <div className="w-3/4 flex flex-col justify-center items-center align-middle space-y-4">
+                <div className="w-3/4 flex p-3 rounded-xl justify-center items-center flex-col ">
                   {messages.length === 0 ? (
                     <div className="w-3/4 flex p-3 rounded-xl my-auto justify-center items-center  flex-col bg-neutral-800">
                       <div className="p-4 m-2 rounded-full bg-emerald-400">
@@ -388,9 +398,18 @@ export default function Navbar() {
                                 }`}
                             >
                               <div className="w-full overflow-y-auto scroll-auto ">
-                                <ReactMarkDown components={markDownComponent}>
+                                {loading && msg.role === 'assistant' ? <div className="flex gap-1">
+                                  <div className="w-2 h-2 rounded-full bg-gray-500 animate-bounce"
+                                    style={{ animationDelay: '0ms' }}></div>
+                                  <div className="w-2 h-2 rounded-full bg-gray-500 animate-bounce"
+                                    style={{ animationDelay: '150ms' }}></div>
+                                  <div className="w-2 h-2 rounded-full bg-gray-500 animate-bounce"
+                                    style={{ animationDelay: '300ms' }}></div>
+                                </div> : <div><ReactMarkDown components={markDownComponent}>
                                   {preprocessMarkdown(msg.content)}
-                                </ReactMarkDown>
+                                </ReactMarkDown></div>}
+
+
                               </div>
                             </div>
                           </div>
@@ -414,7 +433,7 @@ export default function Navbar() {
                     onKeyDown={Handlekeypress}
                     placeholder="Message SparkAi..."
                     rows={1}
-                    className={`w-full  overflow-y-auto scroll-smooth crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 no-scrollbar-firefox-firefox-firefox-firefox-firefox-firefox-firefox-firefox ${isDarkMode ? "bg-[#181818]" : "bg-gray-100"
+                    className={`w-full  overflow-y-auto scroll-smooth crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 no-scrollbar-firefox-firefox-firefox-firefox-firefox-firefox-firefox-firefox ${isDarkMode ? "bg-[#181818]" : "bg-gray-100"
                       } border ${isDarkMode ? "border-gray-700" : "border-gray-300"
                       } ${isDarkMode
                         ? "focus:border-blue-500"

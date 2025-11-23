@@ -46,7 +46,8 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id?.toString();
         token.email = user.email;
         token.username = user.username;
-
+        token.credits = user.credits;
+        token.ispremium = user.ispremium;
       }
       return token
     },
@@ -55,16 +56,18 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id;
         session.user.email = token.email;
         session.user.username = token.username;
+        session.user.credits = token.credits;
+        session.user.ispremium = token.ispremium;
       }
       return session
     }
   },
-  pages:{
-    signIn:'/signin'
+  pages: {
+    signIn: '/signin'
   },
   session: {
     strategy: "jwt"
   },
   secret: process.env.NEXTAUTH_SECRET,
-  debug:true
+  debug: true
 };
