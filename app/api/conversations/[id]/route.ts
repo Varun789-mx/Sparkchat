@@ -5,9 +5,9 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(
     req: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
-    const {id} = await params;
+    const { id } = await params;
     const session = await getServerSession(authOptions);
     if (!session?.user.id) {
         return NextResponse.json({
@@ -29,8 +29,8 @@ export async function GET(
             }, { status: 200 })
         }
         return NextResponse.json({
-            data:{
-                messages:conversation.messages
+            data: {
+                messages: conversation.messages
             },
             success: true,
         }, { status: 200 })
