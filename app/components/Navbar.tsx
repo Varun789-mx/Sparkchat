@@ -6,9 +6,6 @@ import {
   Sidebar,
   Send,
   ChevronLeft,
-  Bot,
-  Copy,
-  TypeIcon,
 } from "lucide-react";
 
 import { useCallback, useRef, useState } from "react";
@@ -19,7 +16,6 @@ import { MODELS } from "@/models/constants";
 import { useSession } from "next-auth/react";
 import { useMarkdown } from "../hooks/useMarkdown";
 import ReactMarkDown from "react-markdown";
-import { ca } from "zod/v4/locales";
 
 interface Messagefields {
   id: number;
@@ -218,8 +214,6 @@ export default function Navbar() {
       .then((res) => res.json())
       .then((data) => setExecutions(data.data))
       .catch((error) => console.log(error));
-
-    console.log(Executions);
   }, []);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(true);
@@ -244,9 +238,9 @@ export default function Navbar() {
                 <X className="w-5 h-5 " />
               </button>
             </div>
-            <button className="w-full bg-emerald-500 hover:bg-emerald-700 text-white rounded-lg py-3 px-4 flex items-center justify-center gap-2 font-medium transition-colors  ">
+            <button className="w-full bg-orange-500 hover:bg-orange-700 text-white rounded-lg py-3 px-4 flex items-center justify-center gap-2 font-medium transition-colors  " onClick={()=>localStorage.removeItem("conversationId")}>
               <Plus className="w-5 h-5" />
-              New Chat
+              New Chat is here 
             </button>
           </div>
           <div className="flex-1 h-[60vh] overflow-hidden p-2">
