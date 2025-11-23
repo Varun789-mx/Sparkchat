@@ -41,7 +41,6 @@ export enum ModelCapability {
 }
 
 export type Message = {
-  id: string,
   role: ROLE,
   content: string,
 }

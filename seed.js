@@ -1,10 +1,9 @@
 // prisma/seed.js
 import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { prisma } from "@/lib/prisma";
 
 async function main() {
-  console.log('í¼± Starting database seed...')
+  console.log('ï¿½ï¿½ï¿½ Starting database seed...')
 
   // Clean up previous data (optional, helps when re-seeding)
   await prisma.message.deleteMany()
@@ -64,7 +63,7 @@ async function main() {
     data: {
       name: 'Chat Assistant',
       description: 'An AI chat assistant for productivity.',
-      icon: 'í²¬',
+      icon: 'ï¿½ï¿½ï¿½',
       conversationId: conversation1.id,
     },
   })
@@ -73,7 +72,7 @@ async function main() {
     data: {
       name: 'Joke Bot',
       description: 'Tells you programming jokes.',
-      icon: 'í´–',
+      icon: 'ï¿½ï¿½ï¿½',
       conversationId: conversation2.id,
     },
   })

@@ -3,6 +3,8 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+  directUrl = env("DATABASE_URL")
 }
 
 datasource db {

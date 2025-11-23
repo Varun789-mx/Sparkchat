@@ -9,8 +9,8 @@ import {
   Bot,
   Copy,
 } from "lucide-react";
+
 import { useCallback, useRef, useState } from "react";
-import type { Message, Messages } from "@/types/general";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { useEffect } from "react";
 import { Sparkle } from "lucide-react";
@@ -18,14 +18,18 @@ import { MODELS } from "@/models/constants";
 import { useSession } from "next-auth/react";
 import { useMarkdown } from "../hooks/useMarkdown";
 import ReactMarkDown from "react-markdown";
+import { ca } from "zod/v4/locales";
 
 interface Messagefields {
   id: number;
+  conversationId?: string,
   role: string;
   content: string;
   timestamp: Date;
 }
 interface conversationsProp {
+  id: string,
+  createdAt: string,
   messages: Messagefields[]
 }
 export default function Navbar() {
@@ -37,11 +41,19 @@ export default function Navbar() {
   const chatcontainerRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<Messagefields[]>([]);
   const { preprocessMarkdown, markDownComponent } = useMarkdown();
+  const [conversationId, setconversationId] = useState("");
   const [userinput, setuserinput] = useState({
     conversationId: "",
     modelId: "",
     message: "",
   });
+
+  const HandleConversationId = () => {
+    const localId = localStorage.getItem("conversationId");
+    if (!localId) {
+      setconversationId(crypto.randomUUID());
+    }
+  }
   const HandleCopy = useCallback(async (content: string) => {
     try {
       await navigator.clipboard.writeText(content);
@@ -53,12 +65,12 @@ export default function Navbar() {
       console.log("Failed to copy ", err);
     }
   }, []);
+
   const Handlesend = async () => {
     if (!userinput.message.trim()) return;
     const model = localStorage.getItem("modelId") || "google/gemini-2.5-flash";
-    let conversationId = localStorage.getItem("conversationId") || "";
+    setconversationId(localStorage.getItem("conversationId") || "");
     if (!conversationId) {
-      conversationId = crypto.randomUUID();
       localStorage.setItem("conversationId", conversationId);
     }
     setuserinput((prev) => ({
@@ -92,7 +104,7 @@ export default function Navbar() {
       },
     ]);
     try {
-      const response = await fetch(`http://localhost:3000/api/chat`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -163,6 +175,21 @@ export default function Navbar() {
     }
   };
 
+  const fetchConversations = async (conversationId: string) => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/conversations/${conversationId}`)
+
+      const data = await response.json();
+      if (data.success && data.data && data.data.messages) {
+        setMessages(data.data.messages)
+        setconversationId(conversationId);
+        localStorage.setItem("conversationId", conversationId)
+        console.log(data);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
   useEffect(() => {
     const container = chatcontainerRef.current;
     if (container) {
@@ -217,7 +244,7 @@ export default function Navbar() {
               className="w-full text-gray-500 flex justify-start"
               onClick={() => setshowchats(!showChats)}
             >
-              Chats {showChats ? <ChevronRight /> : <ChevronDown />}
+              Chats {showChats ? <ChevronDown /> : <ChevronRight />}
             </button>
             <div
               className={`w-full overflow-y-auto h-[calc(100%-2rem)] space-y-2 pr-2 ${isDarkMode ? "bg-[#181818]" : "bg-white"
@@ -237,8 +264,18 @@ export default function Navbar() {
                         ? "bg-[#181818] text-gray-300"
                         : "bg-white text-gray-800"
                         } rounded-xl`}
+                      onClick={() => {
+                        console.log(execution, "From exeecution")
+                        const convid = execution.id;
+                        if (convid) {
+                          fetchConversations(convid.toString())
+                        } else {
+                          console.log("No conversationId")
+                        }
+
+                      }}
                     >
-                      {firstUserMessage?.content?.substring(0, 23) || "New Conversation"}..
+                      {firstUserMessage?.content?.substring(0, 28) || "New Conversation"}..
                     </div>
                   </div>
                 )
@@ -303,8 +340,7 @@ export default function Navbar() {
                           How can i help you today ?
                         </p>
                         <p className="text-gray-300 font-sm text-center">
-                          Lorem ipsum dolor sit amet consectetur, labore libero
-                          facere mollitia , impedit.
+                          Choose various models to get your desired output
                         </p>
                       </div>
                       <div className="w-full flex justify-center gap-5 p-3">
@@ -346,7 +382,7 @@ export default function Navbar() {
                         >
                           <div className="message-container  p-2  flex flex-col justify-start gap-2 overflow-y-auto  scroll-auto ">
                             <div
-                              className={`w-[80%] p-3 flex justify-center  rounded-xl ${msg.role === "user"
+                              className={`w-full p-3 flex justify-center  rounded-xl ${msg.role === "user"
                                 ? "bg-blue-600  text-white"
                                 : "bg-neutral-700 text-gray-200"
                                 }`}

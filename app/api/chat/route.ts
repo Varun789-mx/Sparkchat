@@ -2,7 +2,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/options";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { getModelById, MODELS } from "@/models/constants";
 import { ROLE } from "@/types/general";
 import { InMemoryStore } from "@/lib/InMemoryStore";
@@ -38,7 +38,6 @@ const model = genai.getGenerativeModel({
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
-  const prisma = new PrismaClient();
   const { conversationId, modelId, message } = await req.json();
 
   if (!conversationId || !modelId || !message) {
@@ -57,7 +56,7 @@ export async function POST(req: Request) {
     });
   }
 
-  if (!session) {
+  if (!session?.user.id) {
     return NextResponse.json(
       {
         error: "Unauthorized user",
@@ -133,6 +132,7 @@ export async function POST(req: Request) {
         prisma.conversation.create({
           data: {
             id: conversationId,
+            userId: session.user.id
           },
         }) : prisma.$executeRaw`SELECT 1`
     ]);
@@ -183,12 +183,12 @@ export async function POST(req: Request) {
           prisma.message.createMany({
             data: [
               {
-                conversationId:conversationId,
+                conversationId: conversationId,
                 role: "user",
                 content: message,
               },
               {
-                conversationId:conversationId,
+                conversationId: conversationId,
                 role: "assistant",
                 content: fullresponse,
               },
@@ -215,9 +215,9 @@ export async function POST(req: Request) {
   return new Response(stream, {
     headers: {
       "Content-Type": "text/event-stream; charset=utf-8",
-    "Cache-Control": "no-cache, no-transform",
-    "Connection": "keep-alive",
-    "Transfer-Encoding": "chunked",
+      "Cache-Control": "no-cache, no-transform",
+      "Connection": "keep-alive",
+      "Transfer-Encoding": "chunked",
     },
   });
 }

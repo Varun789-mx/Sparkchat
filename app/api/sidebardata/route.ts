@@ -1,10 +1,11 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/options";
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import {prisma} from "@/lib/prisma"
+import { withAccelerate } from "@prisma/extension-accelerate";
 
 export async function GET() {
-    const prisma = new PrismaClient();
+   
     const session = await getServerSession(authOptions);
     if (!session) {
         console.log("Unauthorized user");
@@ -17,7 +18,25 @@ export async function GET() {
             where: {
                 userId: session.user.id
             }, select: {
-                messages: true,
+                id: true,
+                createdAt: true,
+                messages: {
+                    orderBy: {
+                        createdAt: 'asc'
+                    },
+                    take: 1,
+                    where: {
+                        role: 'user'
+                    }
+                }
+            },
+            orderBy: {
+                updatedAt: 'desc'
+            }
+        }).withAccelerate({
+            cacheStrategy: {
+                ttl: 60,  // Cache for 60 seconds
+                swr: 120  // Serve stale data for 120 seconds while revalidating
             }
         })
         if (Getdata.length === 0) {
