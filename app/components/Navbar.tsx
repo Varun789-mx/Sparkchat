@@ -18,7 +18,7 @@ import { useMarkdown } from "../hooks/useMarkdown";
 import ReactMarkDown from "react-markdown";
 
 interface Messagefields {
-  id: number;
+  id: number | string;
   conversationId?: string,
   role: string;
   content: string;
@@ -31,6 +31,7 @@ interface conversationsProp {
 }
 export default function Navbar() {
   const session = useSession();
+  const [isMessagingLoading, setisMessageLoading] = useState(false);
   const [Executions, setExecutions] = useState<conversationsProp[]>([]);
   const [showChats, setshowchats] = useState(true);
   const [isTyping, setIsTyping] = useState(false);
@@ -45,14 +46,10 @@ export default function Navbar() {
     modelId: "",
     message: "",
   });
-
   useEffect(() => {
-    const existingId = localStorage.getItem("conversationId");
-    if (!existingId) {
-      const newId = crypto.randomUUID();
-      setconversationId(newId);
-      localStorage.setItem("conversationId", newId)
-    }
+    const existingId = localStorage.getItem("conversationId") || crypto.randomUUID();
+    localStorage.setItem("conversationId", existingId)
+    setconversationId(existingId);
   }, [])
   const HandleCopy = useCallback(async (content: string) => {
     try {
@@ -79,7 +76,7 @@ export default function Navbar() {
       conversationId: conversationId,
     }));
     const userMessage = {
-      id: messages.length + 1,
+      id: crypto.randomUUID(),
       role: "user",
       content: userinput.message,
       timestamp: new Date(),
@@ -93,7 +90,7 @@ export default function Navbar() {
       modelId: model,
       conversationId: conversationId,
     }));
-    const assistantMessageId = messages.length + 2;
+    const assistantMessageId = crypto.randomUUID();
     setMessages((prev) => [
       ...prev,
       {
@@ -106,6 +103,7 @@ export default function Navbar() {
     try {
       setIsTyping(true);
       setloading(true);
+      setisMessageLoading(true);
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chat`, {
         method: "POST",
         headers: {
@@ -142,6 +140,7 @@ export default function Navbar() {
               try {
                 setloading(false);
                 setIsTyping(false);
+                setisMessageLoading(false);
                 const parsed = JSON.parse(data);
                 console.log("Chunk received:", parsed.content); // See each chunk
                 assistantMessage += parsed.content;
@@ -193,9 +192,8 @@ export default function Navbar() {
     }
   }
   useEffect(() => {
-    fetchConversations(conversationId);
-    Handlesend();
-  }, [])
+    if (conversationId) fetchConversations(conversationId);
+  }, [conversationId])
   useEffect(() => {
     const container = chatcontainerRef.current;
     if (container) {
@@ -221,8 +219,8 @@ export default function Navbar() {
     <>
       <div className="flex h-screen bg-[#111111]  text-gray-200">
         <div
-          className={`${sidebarOpen ? "w-80" : "w-0"} ${isDarkMode ? "bg-[#181818]" : "bg-white"
-            } transition-all duration-300 overflow-hidden flex flex-col border-r ${isDarkMode ? "border-gray-800" : "border-gray-200"
+          className={`${sidebarOpen ? "w-full md:w-80" : "w-0"} ${isDarkMode ? "bg-[#181818]" : "bg-white"
+            } ${sidebarOpen ? "" : ""} transition-all duration-300 overflow-hidden flex flex-col border-r ${isDarkMode ? "border-gray-800" : "border-gray-200"
             }`}
         >
           <div className="p-4 border-b border-gray-800">
@@ -238,9 +236,9 @@ export default function Navbar() {
                 <X className="w-5 h-5 " />
               </button>
             </div>
-            <button className="w-full bg-orange-500 hover:bg-orange-700 text-white rounded-lg py-3 px-4 flex items-center justify-center gap-2 font-medium transition-colors  " onClick={()=>localStorage.removeItem("conversationId")}>
+            <button className="w-full bg-orange-500 hover:bg-orange-700 text-white rounded-lg py-3 px-4 flex items-center justify-center gap-2 font-medium transition-colors  " onClick={() => localStorage.removeItem("conversationId")}>
               <Plus className="w-5 h-5" />
-              New Chat is here 
+              New Chat 
             </button>
           </div>
           <div className="flex-1 h-[60vh] overflow-hidden p-2">
@@ -272,7 +270,7 @@ export default function Navbar() {
                         console.log(execution, "From exeecution")
                         const convid = execution.id;
                         if (convid) {
-                          fetchConversations(convid.toString())
+                          fetchConversations(convid)
                         } else {
                           console.log("No conversationId")
                         }
@@ -319,7 +317,7 @@ export default function Navbar() {
                 <Sidebar onClick={() => setSidebarOpen(!sidebarOpen)} />
               )}
               <p
-                className="font-light text-gray-200"
+                className="font-light text-gray-200 cursor-pointer"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
               >
                 New chat{" "}
@@ -330,16 +328,17 @@ export default function Navbar() {
               {/* chat messages space  */}
               <div
                 ref={chatcontainerRef}
-                className="flex flex-1 overflow-y-auto  flex-col items-center py-6"
+                className="flex flex-1 overflow-y-auto   flex-col items-center py-6"
               >
-                <div className="w-3/4 flex p-3 rounded-xl justify-center items-center flex-col ">
+                <div className=" w-3/4 md:w-2/4 flex p-3 rounded-xl justify-center items-center flex-col ">
+                  {isMessagingLoading ? (<div></div>) : ("")}
                   {messages.length === 0 ? (
-                    <div className="w-3/4 flex p-3 rounded-xl my-auto justify-center items-center  flex-col bg-neutral-800">
+                    <div className=" flex p-3 rounded-xl my-auto justify-center items-center  flex-col bg-neutral-800">
                       <div className="p-4 m-2 rounded-full bg-emerald-400">
                         <Sparkle className="w-7 h-7 text-white" />
                       </div>
                       <div className="flex justify-center flex-col items-center">
-                        <p className="font-bold text-gray-200 text-4xl">
+                        <p className="font-bold text-gray-200 text-2xl md:4xl">
                           {" "}
                           How can i help you today ?
                         </p>
@@ -392,7 +391,7 @@ export default function Navbar() {
                                 }`}
                             >
                               <div className="w-full overflow-y-auto scroll-auto ">
-                                {loading && msg.role === 'assistant' ? <div className="flex gap-1">
+                                {loading && msg.role === 'assistant' || msg.content.length === 0 ? <div className="flex gap-1">
                                   <div className="w-2 h-2 rounded-full bg-gray-500 animate-bounce"
                                     style={{ animationDelay: '0ms' }}></div>
                                   <div className="w-2 h-2 rounded-full bg-gray-500 animate-bounce"
@@ -402,8 +401,6 @@ export default function Navbar() {
                                 </div> : <div><ReactMarkDown components={markDownComponent}>
                                   {preprocessMarkdown(msg.content)}
                                 </ReactMarkDown></div>}
-
-
                               </div>
                             </div>
                           </div>
@@ -418,7 +415,7 @@ export default function Navbar() {
               className={`w-full overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 scroll-smooth rounded-xl px-4 py-3 pr-12 resize-none`}
             >
               <div className="max-w-3xl mx-auto">
-                <div className="relative overflow-hidden">
+                <div className="relative  overflow-hidden">
                   <textarea
                     value={userinput.message}
                     onChange={(e) =>
@@ -468,11 +465,23 @@ export default function Navbar() {
 
 export const ModelSelector = () => {
   const [selectedmodel, setselectedmodel] = useState("");
-  const HandleModelSelect = (e: any) => {
+
+  const HandleModelSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const modelId = e.target.value;
     setselectedmodel(modelId);
     localStorage.setItem("modelId", modelId);
   };
+
+  useEffect(() => {
+    const SavedModel = localStorage.getItem("modelId");
+    if (SavedModel) {
+      setselectedmodel(SavedModel);
+    } else {
+      const DefaultModel = "google/gemini-2.5-flash";
+      setselectedmodel(DefaultModel);
+      localStorage.setItem("modelId", DefaultModel);
+    }
+  }, [selectedmodel])
   return (
     <select
       value={selectedmodel}
