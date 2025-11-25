@@ -7,6 +7,7 @@ import {
   Send,
   ChevronLeft,
   LogOut,
+  ChevronUp,
 } from "lucide-react";
 
 import { useCallback, useRef, useState } from "react";
@@ -302,7 +303,7 @@ export default function Navbar() {
                   </div>
                   <div className={`text-gray-500 text-xs flex justify-start gap-4  `}>Free Plan <p>Credits: {session.data?.user.credits?.toString()}</p></div>
                 </div>
-                <ChevronDown className={`w-4 h-4 text-gray-500`} />
+              {isfooterOpen?<ChevronDown className={`w-4 h-4 text-gray-500`} />: <ChevronUp className={`w-4 h-4 text-gray-500`} />}  
               </button>
             </div>
           </footer>
