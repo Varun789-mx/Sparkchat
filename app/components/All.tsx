@@ -4,7 +4,7 @@ import { Send, Plus, Menu, Sparkles, User, Bot, ChevronDown, Sun, Moon } from 'l
 import { signOut } from 'next-auth/react';
 import { v4 } from "uuid";
 import { useModel } from '@/hooks/useModel';
-import { Chatlist } from './SIdebar';
+import { Chatlist } from './temp';
 
 interface Message {
     id: number;

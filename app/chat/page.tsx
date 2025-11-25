@@ -2,7 +2,7 @@
 import { useParams } from "next/navigation";
 import ChatbotInterface from "../components/All";
 
-import { Chatlist } from "../components/SIdebar";
+import { Chatlist } from "../components/temp";
 import { SessionProvider } from "next-auth/react";
 import Chatbox from "../components/chatbox";
 

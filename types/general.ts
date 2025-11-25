@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { SUPPORTER_MODELS } from "../models/constants";
+import { Conversation } from "@prisma/client";
 
 export interface Model {
   id: string;
@@ -50,3 +51,28 @@ export interface ExecutionType {
 }
 
 export type Messages = Message[];
+
+export interface Messagefields {
+  id: string;
+  conversationId?: string;
+  role: ROLE;
+  content: string;
+  timestamp: Date;
+}
+export interface conversationsProp {
+  id: string,
+  createdAt: string,
+  messages: Messagefields[]
+}
+
+export interface ChatStoreProps {
+  conversationId: string,
+  message: Messagefields[]
+  conversations: conversationsProp[]
+  isLoading: boolean
+
+  setConversationId: (id: string) => void
+  setMessages: (messages: Messagefields[]) => void
+  setConversations: (Conversation: conversationsProp[]) => void
+  loadingConversations: (id: string) => Promise<void>
+}
