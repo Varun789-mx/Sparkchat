@@ -6,6 +6,7 @@ import {
   Sidebar,
   Send,
   ChevronLeft,
+  LogOut,
 } from "lucide-react";
 
 import { useCallback, useRef, useState } from "react";
@@ -13,7 +14,7 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 import { useEffect } from "react";
 import { Sparkle } from "lucide-react";
 import { MODELS } from "@/models/constants";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useMarkdown } from "../hooks/useMarkdown";
 import ReactMarkDown from "react-markdown";
 
@@ -31,6 +32,7 @@ interface conversationsProp {
 }
 export default function Navbar() {
   const session = useSession();
+  const [isfooterOpen,setisfooterOpen] = useState(true);
   const [isMessagingLoading, setisMessageLoading] = useState(false);
   const [Executions, setExecutions] = useState<conversationsProp[]>([]);
   const [showChats, setshowchats] = useState(true);
@@ -286,7 +288,9 @@ export default function Navbar() {
           </div>
           <footer>
             <div className={`p-3 border-t border-gray-800`}>
+              <div hidden={isfooterOpen} className="flex  justify-start  py-1"><button onClick={()=>signOut()} className="bg-gray-800  w-2/3 flex justify-start gap-3 p-2 rounded-lg text-sm hover:bg-gray-700"><LogOut className="w-8 h-5"/>Log out</button></div>
               <button
+              onClick={()=>setisfooterOpen(!isfooterOpen)}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-gray-800 transition-colors`}
               >
                 <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-medium">
