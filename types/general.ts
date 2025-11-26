@@ -20,11 +20,11 @@ export enum ROLE {
 }
 
 export interface ChatSchema {
-  id: string
-  createdAt: Date
-  updatedAt: Date
-  role: ROLE,
-  content: string
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  role: ROLE;
+  content: string;
 }
 
 export enum ModelProvider {
@@ -42,9 +42,9 @@ export enum ModelCapability {
 }
 
 export type Message = {
-  role: ROLE,
-  content: string,
-}
+  role: ROLE;
+  content: string;
+};
 export interface ExecutionType {
   id?: string;
   title?: string;
@@ -60,19 +60,26 @@ export interface Messagefields {
   timestamp: Date;
 }
 export interface conversationsProp {
-  id: string,
-  createdAt: string,
-  messages: Messagefields[]
+  id: string;
+  createdAt: string;
+  messages: Messagefields[];
 }
 
 export interface ChatStoreProps {
-  conversationId: string,
-  message: Messagefields[]
-  conversations: conversationsProp[]
-  isLoading: boolean
+  conversationId: string;
+  messages: Messagefields[];
+  conversations: conversationsProp[];
+  isLoading: boolean;
+  isStreaming: boolean;
+  error: string | null;
 
-  setConversationId: (id: string) => void
-  setMessages: (messages: Messagefields[]) => void
-  setConversations: (Conversation: conversationsProp[]) => void
-  loadingConversations: (id: string) => Promise<void>
+  setConversationId: (id: string) => void;
+  setMessages: (message: Messagefields[]) => void;
+  addMessage:(message:Messagefields)=>void;
+  updateLastMessage:(content:string)=>void;
+  setConversations: (Conversation: conversationsProp[]) => void;
+  loadingConversations: (id: string) => Promise<void>;
+  FetchConversations:()=>Promise<void>
+  sendMessage:(message:string,modelId:string)=>Promise<void>
+  reset:()=>void
 }

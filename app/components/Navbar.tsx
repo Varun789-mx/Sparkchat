@@ -73,7 +73,7 @@ export default function Navbar() {
       timestamp: new Date(),
     };
     setMessages([...messages, userMessage]);
-
+    console.log(messages,"From line 76")
     const currentMessage = userinput.message;
     setuserinput((prev) => ({
       ...prev,
