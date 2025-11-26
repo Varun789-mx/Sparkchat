@@ -1,3 +1,4 @@
+"use server"
 import type { Message } from "@/types/general";
 import systemPrompt from "./systemprompt";
 const MAX_TOKEN_ITERATONS = 1000;
@@ -24,7 +25,6 @@ export const GetModelResponse = async (
           max_tokens: 4096
         }),
       });
-    console.log(response)
     const reader = response.body?.getReader();
     if (!reader) {
       throw new Error("Response body is not readable");
@@ -66,7 +66,6 @@ export const GetModelResponse = async (
               const content = parsed.choices?.[0]?.delta?.content;
               if (content) {
                 cb(content);
-                console.log(content, "From get model respons");
               }
             } catch (e) {
               console.log("Failed to parse SSE data", data, e);

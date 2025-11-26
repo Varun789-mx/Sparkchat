@@ -72,6 +72,7 @@ export interface ChatStoreProps {
   isLoading: boolean;
   isStreaming: boolean;
   error: string | null;
+  credits:number,
 
   setConversationId: (id: string) => void;
   setMessages: (message: Messagefields[]) => void;
@@ -82,4 +83,5 @@ export interface ChatStoreProps {
   FetchConversations:()=>Promise<void>
   sendMessage:(message:string,modelId:string)=>Promise<void>
   reset:()=>void
+  setcredits:()=>Promise<void>
 }

@@ -27,7 +27,7 @@ export const useMarkdown = () => {
       ),
       blockquote: ({ children }: any) => (
         <blockquote className="border-l-4 border-blue-500 pl-3 italic opacity-80">
-          {children}
+        {children}
         </blockquote>
       ),
     }),

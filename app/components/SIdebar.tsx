@@ -22,6 +22,7 @@ export default function SideChatBar({
   const session = useSession();
   const Theme = true;
   const { setConversationId, conversationId } = useChatStore();
+  const credits = useChatStore((state)=>state.credits)
   const reset = useChatStore((state) => state.reset);
   const conversations = useChatStore((state) => state.conversations);
   const FetchConversations = useChatStore((state) => state.FetchConversations);
@@ -38,10 +39,9 @@ export default function SideChatBar({
 
   return (
     <div
-      className={`${SideBar ? "w-full md:w-70" : "w-0"} ${
+      className={`${SideBar ? "w-2/3 md:w-70" : "w-0"} ${
         Theme ? "bg-[#181818]" : "bg-white"
-      } ${
-        SideBar ? "" : ""
+      } 
       } transition-all duration-300 overflow-hidden flex flex-col border-r ${
         Theme ? "border-gray-800" : "border-gray-200"
       }`}
@@ -153,7 +153,7 @@ export default function SideChatBar({
                 className={`text-gray-300 text-xs flex justify-start gap-4  `}
               >
                 Free Plan{" "}
-                <p>Credits: {session.data?.user.credits?.toString()}</p>
+                <p>Credits: {credits.toString()}</p>
               </div>
             </div>
             {isFooterOpen ? (

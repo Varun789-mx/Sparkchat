@@ -12,6 +12,7 @@ export const useChatStore = create<ChatStoreProps>()(
         isLoading: false,
         isStreaming: false,
         error: null,
+        credits: 0,
 
         setConversationId: (id: string) => {
           set({ conversationId: id }),
@@ -177,6 +178,20 @@ export const useChatStore = create<ChatStoreProps>()(
           });
           localStorage.setItem("conversationId", newId);
         },
+        setcredits: async () => {
+          try {
+            const response = await fetch(`http://localhost:3000/api/credits`);
+            if (!response) {
+              throw new Error("Unable to get credits response")
+            }
+            const data = await response.json();
+            console.log(data, "from chatstore")
+            set({ credits: data.credits || 0 });
+          } catch (error) {
+            console.log("Unable to get user credits");
+            set({ credits: 0 });
+          }
+        }
       }),
       { name: "Chat-storage" }
     )

@@ -2,22 +2,19 @@
 import { Sidebar, Send, ChevronLeft } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import { useEffect } from "react";
-import { useMarkdown } from "../hooks/useMarkdown";
-import ReactMarkDown from "react-markdown";
 import SideChatBar from "./SIdebar";
 import { useChatStore } from "@/hooks/useChatStore";
 import { ModelSelector } from "./ModelSelector";
-import FirstMessage from "./FirstMessages";
-import { Typing } from "./Typing";
+import ConversationBox from "./ConversationBox";
+
 
 export default function Navbar() {
   const [isTyping, setIsTyping] = useState(false);
-  const [copied, setcopied] = useState(false);
+
   const chatcontainerRef = useRef<HTMLDivElement>(null);
-  const { preprocessMarkdown, markDownComponent } = useMarkdown();
   const conversationId = useChatStore((state) => state.conversationId);
   const setconversationId = useChatStore((state) => state.setConversationId);
-  const { messages, sendMessage, isStreaming } = useChatStore();
+  const { messages, sendMessage } = useChatStore();
   const [userinput, setuserinput] = useState({
     conversationId: "",
     modelId: "",
@@ -29,17 +26,7 @@ export default function Navbar() {
     localStorage.setItem("conversationId", existingId);
     setconversationId(existingId);
   }, []);
-  const HandleCopy = useCallback(async (content: string) => {
-    try {
-      await navigator.clipboard.writeText(content);
-      setcopied(true);
-      setTimeout(() => {
-        setcopied(false);
-      }, 2000);
-    } catch (err) {
-      console.log("Failed to copy ", err);
-    }
-  }, []);
+
 
   const Handlesend = async () => {
     if (!userinput.message.trim()) return;
@@ -53,8 +40,13 @@ export default function Navbar() {
       modelId: model,
       conversationId: conversationId,
     }));
-
-    await sendMessage(userinput.message, model);
+    const currentMessage = userinput.message;
+    setuserinput({
+      modelId: model,
+      conversationId: conversationId,
+      message: ""
+    })
+    await sendMessage(currentMessage, model);
   };
   const Handlekeypress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key == "Enter" && !e.shiftKey) {
@@ -90,10 +82,10 @@ export default function Navbar() {
           <div className="flex-1 flex flex-col h-full ">
             {/* for header */}
             <div
-              className={`w-full gap-4 ${
-                isDarkMode ? "bg-[#181818]" : "bg-white"
-              } flex justify-start p-4`}
+              className={`${sidebarOpen ? "w-0 md:w-full " : "w-full"} gap-4 ${isDarkMode ? "bg-[#181818]" : "bg-white"
+                } flex justify-start p-4`}
             >
+              {sidebarOpen ? "" : <Sidebar />}
               <p
                 className="font-light text-gray-200 cursor-pointer"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -108,56 +100,13 @@ export default function Navbar() {
                 ref={chatcontainerRef}
                 className="flex flex-1 overflow-y-auto   flex-col items-center py-6"
               >
-                <div className="flex md:w-[60%] p-2 justify-center items-center flex-col ">
-                  {messages.length === 0 ? (
-                    <FirstMessage />
-                  ) : (
-                    <div className="w-3/4 flex p-2 flex-col space-y-4">
-                      {messages.map((msg) => (
-                        <div
-                          key={msg.id}
-                          className={`flex w-full ${
-                            msg.role === "user"
-                              ? "justify-end"
-                              : "justify-start"
-                          }`}
-                        >
-                          <div className="message-container  p-2  flex flex-col justify-start gap-2 overflow-y-auto  scroll-auto ">
-                            <div
-                              className={`w-full p-3 flex justify-center  rounded-xl ${
-                                msg.role === "user"
-                                  ? "bg-blue-600  text-white"
-                                  : "bg-neutral-700 text-gray-200"
-                              }`}
-                            >
-                              <div className="w-full overflow-y-auto scroll-auto ">
-                                {!isStreaming &&
-                                msg.role === "assistant" &&
-                                msg.content.length === 0 ? (
-                                  <Typing />
-                                ) : (
-                                  <div>
-                                    <ReactMarkDown
-                                      components={markDownComponent}
-                                    >
-                                      {preprocessMarkdown(msg.content)}
-                                    </ReactMarkDown>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                <ConversationBox />
               </div>
             </div>
             <div
               className={`w-full overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 scroll-smooth rounded-xl px-4 py-3 pr-12 resize-none`}
             >
-              <div className="max-w-3xl mx-auto">
+              <div className={` mx-auto ${sidebarOpen ? "w-0 md:w-3xl" : "max-w-3xl"} `}>
                 <div className="relative  overflow-hidden">
                   <textarea
                     value={userinput.message}
@@ -167,17 +116,13 @@ export default function Navbar() {
                     onKeyDown={Handlekeypress}
                     placeholder="Message SparkAi..."
                     rows={1}
-                    className={`w-full  overflow-y-auto scroll-smooth crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 no-scrollbar-firefox-firefox-firefox-firefox-firefox-firefox-firefox-firefox ${
-                      isDarkMode ? "bg-[#181818]" : "bg-gray-100"
-                    } border ${
-                      isDarkMode ? "border-gray-700" : "border-gray-300"
-                    } ${
-                      isDarkMode
+                    className={`w-full  overflow-y-auto scroll-smooth crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 no-scrollbar-firefox-firefox-firefox-firefox-firefox-firefox-firefox-firefox ${isDarkMode ? "bg-[#181818]" : "bg-gray-100"
+                      } border ${isDarkMode ? "border-gray-700" : "border-gray-300"
+                      } ${isDarkMode
                         ? "focus:border-blue-500"
                         : "focus:border-blue-400"
-                    } rounded-xl px-4  py-3 pr-12 ${
-                      isDarkMode ? "text-white" : "text-gray-200"
-                    } placeholder-gray-500 focus:outline-none resize-none transition-colors`}
+                      } rounded-xl px-4  py-3 pr-12 ${isDarkMode ? "text-white" : "text-gray-200"
+                      } placeholder-gray-500 focus:outline-none resize-none transition-colors`}
                     style={
                       {
                         minHeight: "52px",
@@ -189,18 +134,15 @@ export default function Navbar() {
                   <button
                     onClick={Handlesend}
                     disabled={isTyping}
-                    className={`absolute right-2 bottom-2 w-8 h-8 m-2 rounded-lg flex items-center align-middle justify-center transition-all ${
-                      !isTyping
-                        ? "bg-orange-500 hover:bg-orange-700"
-                        : `${
-                            isDarkMode ? "bg-[#181818]" : "bg-gray-100"
-                          } cursor-not-allowed`
-                    }`}
+                    className={`absolute right-2 bottom-2 w-8 h-8 m-2 rounded-lg flex items-center align-middle justify-center transition-all ${!isTyping
+                      ? "bg-orange-500 hover:bg-orange-700"
+                      : `${isDarkMode ? "bg-[#181818]" : "bg-gray-100"
+                      } cursor-not-allowed`
+                      }`}
                   >
                     <Send
-                      className={`w-4 h-4 ${
-                        !isTyping ? "text-white" : "text-gray-500"
-                      }`}
+                      className={`w-4 h-4 ${!isTyping ? "text-white" : "text-gray-500"
+                        }`}
                     />
                   </button>
                 </div>
