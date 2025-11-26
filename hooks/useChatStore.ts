@@ -75,13 +75,13 @@ export const useChatStore = create<ChatStoreProps>()(
           const state = get();
           let currentConversationId = state.conversationId;
           if (!currentConversationId) {
-            currentConversationId = crypto.randomUUID.toString();
+            currentConversationId = crypto.randomUUID();
             set({ conversationId: currentConversationId });
             localStorage.setItem("conversationId", currentConversationId);
           }
 
           const UserMessage: Messagefields = {
-            id: crypto.randomUUID().toString(),
+            id: crypto.randomUUID(),
             conversationId: currentConversationId,
             role: ROLE.USER,
             content: message,
@@ -90,7 +90,7 @@ export const useChatStore = create<ChatStoreProps>()(
           set((state) => ({
             messages: [...state.messages, UserMessage],
           }));
-          const assistantMessageId = crypto.randomUUID().toString();
+          const assistantMessageId = crypto.randomUUID();
           const assistantMessage = {
             id: assistantMessageId,
             conversationId: currentConversationId,
@@ -139,10 +139,10 @@ export const useChatStore = create<ChatStoreProps>()(
                     }
                     try {
                       const parsed = JSON.parse(data);
-                      assistantMessage = parsed.content;
+                      assistantMessage += parsed.content;
                       set((state) => ({
                         messages: state.messages.map((msg) =>
-                          msg.id === assistantMessage
+                          msg.id === assistantMessageId
                             ? { ...msg, content: assistantMessage }
                             : msg
                         ),
@@ -169,7 +169,7 @@ export const useChatStore = create<ChatStoreProps>()(
           }
         },
         reset: () => {
-          const newId = crypto.randomUUID().toString();
+          const newId = crypto.randomUUID();
           set({
             conversationId: newId,
             messages: [],
