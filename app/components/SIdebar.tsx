@@ -22,7 +22,7 @@ export default function SideChatBar({
   const session = useSession();
   const Theme = true;
   const { setConversationId, conversationId } = useChatStore();
-  const credits = useChatStore((state)=>state.credits)
+  const credits = useChatStore((state) => state.credits);
   const reset = useChatStore((state) => state.reset);
   const conversations = useChatStore((state) => state.conversations);
   const FetchConversations = useChatStore((state) => state.FetchConversations);
@@ -53,7 +53,7 @@ export default function SideChatBar({
             <span className="text-orange-300">Spark AI</span>
           </h1>
           <button
-            onClick={() => setSideBar(false)}
+            onClick={() => setSideBar(!SideBar)}
             className=" p-2 hover:bg-gray-700  text-white rounded-lg"
           >
             <X className="w-5 h-5 " />
@@ -73,7 +73,9 @@ export default function SideChatBar({
       <div className="flex-1 overflow-hidden p-2">
         <button
           className="w-full text-gray-500 flex justify-start"
-          onClick={() => setShowChats(!ShowChats)}
+          onClick={() => {
+            setShowChats(!ShowChats);
+          }}
         >
           Chats {ShowChats ? <ChevronDown /> : <ChevronRight />}
         </button>
@@ -130,7 +132,10 @@ export default function SideChatBar({
             className="flex  justify-start  py-1 transition-all duration-1000"
           >
             <button
-              onClick={() => signOut()}
+              onClick={() => {
+                signOut();
+                setisFooterOpen(!isFooterOpen);
+              }}
               className="bg-gray-800  w-2/3 flex 
                         justify-start gap-3 p-2 rounded-lg text-sm hover:bg-gray-700"
             >
@@ -152,8 +157,7 @@ export default function SideChatBar({
               <div
                 className={`text-gray-300 text-xs flex justify-start gap-4  `}
               >
-                Free Plan{" "}
-                <p>Credits: {credits.toString()}</p>
+                Free Plan <p>Credits: {credits.toString()}</p>
               </div>
             </div>
             {isFooterOpen ? (

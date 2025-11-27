@@ -40,28 +40,26 @@ export default function ConversationBox() {
                         <div
                             key={msg.id}
                             className={`flex w-full ${msg.role === "user"
-                                ? "justify-end"
+                                ? "justify-end "
                                 : "justify-start"
                                 }`}
                         >
-                            <div className="message-container  p-2  flex flex-col justify-start gap-2 overflow-y-auto  scroll-auto ">
+                            <div className="message-container w-fit  flex flex-col justify-start gap-2 overflow-y-auto  scroll-auto ">
                                 <div
-                                    className={`w-full p-3 flex justify-center  rounded-xl ${msg.role === "user"
-                                        ? "bg-gray-800  text-white"
-                                        : "bg-transparent-500 text-gray-00"
+                                    className={`w-fit p-2   flex justify-center  rounded-xl ${msg.role === "user"
+                                        ? "bg-gray-700  text-white"
+                                        : "bg-transparent-500  text-gray-200"
                                         }`}
                                 >
-
-                                    <div className="w-full overflow-y-auto scroll-auto ">
+                                    <div className="overflow-y-auto scroll-auto  ">
                                         {!isStreaming &&
                                             msg.role === "assistant" &&
                                             msg.content.length === 0 ? (
                                             <Typing />
                                         ) : (
-                                            <div>
+                                            <div className="w-full rounded-xl border border-gray-800">
                                                 <ReactMarkDown
                                                     components={markDownComponent}
-
                                                 >
                                                     {preprocessMarkdown(msg.content)}
                                                 </ReactMarkDown>

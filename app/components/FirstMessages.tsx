@@ -23,7 +23,7 @@ export default function FirstMessage() {
           </p>
         </div>
 
-        <div className="w-full h-32 p-3 rounded-lg border-orange-500/20 bg-neutral-800 hover:border-orange-500/40 transition-all text-center  text-lg text-gray-300 ">
+        <div className="w-full h-32 p-3 rounded-lg border-orange-500/20 bg-neutral-800 overflow-hidden hover:border-orange-500/40 transition-all text-center  text-lg text-gray-300 ">
           <p className="text-lg font-bold  text-white ">Text summaraization</p>
           <p className="align-middle font-light text-sm text-orange-300">
             create summaries and understand better

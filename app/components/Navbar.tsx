@@ -1,12 +1,12 @@
 "use client";
 import { Sidebar, Send, ChevronLeft } from "lucide-react";
-import { useCallback, useRef, useState } from "react";
+import {  useRef, useState } from "react";
+import {toast, Toaster} from "react-hot-toast";
 import { useEffect } from "react";
 import SideChatBar from "./SIdebar";
 import { useChatStore } from "@/hooks/useChatStore";
 import { ModelSelector } from "./ModelSelector";
 import ConversationBox from "./ConversationBox";
-
 
 export default function Navbar() {
   const [isTyping, setIsTyping] = useState(false);
@@ -14,7 +14,7 @@ export default function Navbar() {
   const chatcontainerRef = useRef<HTMLDivElement>(null);
   const conversationId = useChatStore((state) => state.conversationId);
   const setconversationId = useChatStore((state) => state.setConversationId);
-  const { messages, sendMessage } = useChatStore();
+  const { messages, sendMessage, credits } = useChatStore();
   const [userinput, setuserinput] = useState({
     conversationId: "",
     modelId: "",
@@ -26,7 +26,6 @@ export default function Navbar() {
     localStorage.setItem("conversationId", existingId);
     setconversationId(existingId);
   }, []);
-
 
   const Handlesend = async () => {
     if (!userinput.message.trim()) return;
@@ -44,9 +43,15 @@ export default function Navbar() {
     setuserinput({
       modelId: model,
       conversationId: conversationId,
-      message: ""
-    })
-    await sendMessage(currentMessage, model);
+      message: "",
+    });
+    if (credits > 0) {
+      toast.error("Insufficient Credits")
+      return;
+    }
+    else {
+ await sendMessage(currentMessage, model);
+    }
   };
   const Handlekeypress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key == "Enter" && !e.shiftKey) {
@@ -73,17 +78,16 @@ export default function Navbar() {
   return (
     <>
       <div className="flex h-screen bg-[#111111]  text-gray-200">
-        <SideChatBar
-          SideBar={sidebarOpen}
-          setSideBar={setSidebarOpen}
-        />
+      <div><Toaster/></div>
+        <SideChatBar SideBar={sidebarOpen} setSideBar={setSidebarOpen} />
 
         <div className="flex-1 flex flex-col">
           <div className="flex-1 flex flex-col h-full ">
             {/* for header */}
             <div
-              className={`${sidebarOpen ? "w-0 md:w-full " : "w-full"} gap-4 ${isDarkMode ? "bg-[#181818]" : "bg-white"
-                } flex justify-start p-4`}
+              className={`${sidebarOpen ? "w-0 md:w-full " : "w-full"} gap-4 ${
+                isDarkMode ? "bg-[#181818]" : "bg-white"
+              } flex justify-start p-4`}
             >
               {sidebarOpen ? "" : <Sidebar />}
               <p
@@ -98,7 +102,9 @@ export default function Navbar() {
               {/* chat messages space  */}
               <div
                 ref={chatcontainerRef}
-                className="flex flex-1 overflow-y-auto   flex-col items-center py-6"
+                className={`flex flex-1 overflow-y-auto ${
+                  sidebarOpen ? "w-0" : "w-full"
+                } md:w-full flex-col items-center py-6`}
               >
                 <ConversationBox />
               </div>
@@ -106,7 +112,11 @@ export default function Navbar() {
             <div
               className={`w-full overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 scroll-smooth rounded-xl px-4 py-3 pr-12 resize-none`}
             >
-              <div className={` mx-auto ${sidebarOpen ? "w-0 md:w-3xl" : "max-w-3xl"} `}>
+              <div
+                className={` mx-auto ${
+                  sidebarOpen ? "w-0 md:w-3xl" : "max-w-3xl"
+                } `}
+              >
                 <div className="relative  overflow-hidden">
                   <textarea
                     value={userinput.message}
@@ -116,13 +126,17 @@ export default function Navbar() {
                     onKeyDown={Handlekeypress}
                     placeholder="Message SparkAi..."
                     rows={1}
-                    className={`w-full  overflow-y-auto scroll-smooth crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 no-scrollbar-firefox-firefox-firefox-firefox-firefox-firefox-firefox-firefox ${isDarkMode ? "bg-[#181818]" : "bg-gray-100"
-                      } border ${isDarkMode ? "border-gray-700" : "border-gray-300"
-                      } ${isDarkMode
+                    className={`w-full  overflow-y-auto scroll-smooth crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 no-scrollbar-firefox-firefox-firefox-firefox-firefox-firefox-firefox-firefox ${
+                      isDarkMode ? "bg-[#181818]" : "bg-gray-100"
+                    } border ${
+                      isDarkMode ? "border-gray-700" : "border-gray-300"
+                    } ${
+                      isDarkMode
                         ? "focus:border-blue-500"
                         : "focus:border-blue-400"
-                      } rounded-xl px-4  py-3 pr-12 ${isDarkMode ? "text-white" : "text-gray-200"
-                      } placeholder-gray-500 focus:outline-none resize-none transition-colors`}
+                    } rounded-xl px-4  py-3 pr-12 ${
+                      isDarkMode ? "text-white" : "text-gray-200"
+                    } placeholder-gray-500 focus:outline-none resize-none transition-colors`}
                     style={
                       {
                         minHeight: "52px",
@@ -134,15 +148,18 @@ export default function Navbar() {
                   <button
                     onClick={Handlesend}
                     disabled={isTyping}
-                    className={`absolute right-2 bottom-2 w-8 h-8 m-2 rounded-lg flex items-center align-middle justify-center transition-all ${!isTyping
-                      ? "bg-orange-500 hover:bg-orange-700"
-                      : `${isDarkMode ? "bg-[#181818]" : "bg-gray-100"
-                      } cursor-not-allowed`
-                      }`}
+                    className={`absolute right-2 bottom-2 w-8 h-8 m-2 rounded-lg flex items-center align-middle justify-center transition-all ${
+                      !isTyping
+                        ? "bg-orange-500 hover:bg-orange-700"
+                        : `${
+                            isDarkMode ? "bg-[#181818]" : "bg-gray-100"
+                          } cursor-not-allowed`
+                    }`}
                   >
                     <Send
-                      className={`w-4 h-4 ${!isTyping ? "text-white" : "text-gray-500"
-                        }`}
+                      className={`w-4 h-4 ${
+                        !isTyping ? "text-white" : "text-gray-500"
+                      }`}
                     />
                   </button>
                 </div>

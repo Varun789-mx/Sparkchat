@@ -185,7 +185,6 @@ export const useChatStore = create<ChatStoreProps>()(
               throw new Error("Unable to get credits response")
             }
             const data = await response.json();
-            console.log(data, "from chatstore")
             set({ credits: data.credits || 0 });
           } catch (error) {
             console.log("Unable to get user credits");
