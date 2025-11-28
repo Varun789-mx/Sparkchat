@@ -1,11 +1,12 @@
 "use client"
 import { Eye, EyeOff,CheckCircle } from "lucide-react";
 import { ChangeEvent, FormEvent, FormEventHandler, useState } from "react"
-import { signIn } from "next-auth/react";
+import { getProviders, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { Providers } from "../providers";
 
 
-export default function Signup() {
+export default function Signup({providers}) {
     const router = useRouter();
     const [success,setsuccess]  = useState(true);
     const [formData, setFormData] = useState({
@@ -15,6 +16,14 @@ export default function Signup() {
 const [showPassword, setshowPassword] = useState(false);
 const [loading, setloading] = useState(false);
 const [errors, seterrors] = useState("");
+
+ async function getServerSideProps()  {
+    const provider = await getProviders();
+    return {
+        props:{provider}
+    }
+}
+
 
 const Handleformdata = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -162,6 +171,13 @@ return (
                         <span className="mx-2 text-gray-400 text-sm">or Sign in with</span>
                         <div className="grow border-t border-gray-500"></div>
                     </div>
+                    {Object.values(providers).map((provider)=>(
+                        <div key={provider.name}>
+                            <button onClick={()=>signIn(provider.id)}>
+                                {provider.name}
+                            </button>
+                        </div>
+                    ))}
                     <div className="text-center text-sm text-gray-400">
                             Don't have an account?{" "}
                             <a

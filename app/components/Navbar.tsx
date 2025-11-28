@@ -85,37 +85,29 @@ export default function Navbar() {
           <div className="flex-1 flex flex-col h-full ">
             {/* for header */}
             <div
-              className={`${sidebarOpen ? "w-0 md:w-full " : "w-full"} gap-4 ${
+              className={`w-full gap-4 ${
                 isDarkMode ? "bg-[#181818]" : "bg-white"
-              } flex justify-start p-4`}
+              } flex justify-start items-center p-4`}
             >
-              {sidebarOpen ? "" : <Sidebar />}
+              <button onClick={() => setSidebarOpen(!sidebarOpen)} className="hover:bg-gray-700 p-2 rounded-lg transition-colors ">
+              {sidebarOpen ? "" : <Sidebar />} </button>
               <p
                 className="font-light text-gray-200 cursor-pointer"
-                onClick={() => setSidebarOpen(!sidebarOpen)}
+                
               >
                 New chat{" "}
               </p>
               <ModelSelector />
             </div>
-            <div className="flex-1  flex flex-col overflow-hidden align-middle bg-black">
+            <div  ref={chatcontainerRef} className="flex-1  overflow-y-auto w-full  flex justify-center ">
               {/* chat messages space  */}
-              <div
-                ref={chatcontainerRef}
-                className={`flex flex-1 overflow-y-auto ${
-                  sidebarOpen ? "w-0" : "w-full"
-                } md:w-full flex-col items-center py-6`}
-              >
                 <ConversationBox />
-              </div>
             </div>
             <div
               className={`w-full overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 scroll-smooth rounded-xl px-4 py-3 pr-12 resize-none`}
             >
               <div
-                className={` mx-auto ${
-                  sidebarOpen ? "w-0 md:w-3xl" : "max-w-3xl"
-                } `}
+                className={` mx-auto max-w-3xl w-full `}
               >
                 <div className="relative  overflow-hidden">
                   <textarea

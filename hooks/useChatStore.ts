@@ -180,7 +180,7 @@ export const useChatStore = create<ChatStoreProps>()(
         },
         setcredits: async () => {
           try {
-            const response = await fetch(`http://localhost:3000/api/credits`);
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/credits`);
             if (!response) {
               throw new Error("Unable to get credits response")
             }
