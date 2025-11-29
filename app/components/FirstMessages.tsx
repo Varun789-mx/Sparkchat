@@ -1,13 +1,16 @@
 import { Sparkle } from "lucide-react";
+import { useSession } from "next-auth/react";
 
 export default function FirstMessage() {
+  const session = useSession();
   return (
     <div className=" flex p-3 rounded-xl my-auto justify-center items-center  flex-col bg-neutral-800">
       <div className="p-4 m-2 rounded-full bg-emerald-400">
         <Sparkle className="w-7 h-7 text-white" />
       </div>
       <div className="flex justify-center flex-col items-center">
-        <p className="font-bold text-gray-200 text-2xl md:4xl">
+        <p className="font-bold text-gray-200 text-xl md:4xl">Hello {session.data?.user.username.split(" ")[0]}</p>
+        <p className="font-bold text-gray-200 text-lg md:4xl">
           {" "}
           How can i help you today ?
         </p>

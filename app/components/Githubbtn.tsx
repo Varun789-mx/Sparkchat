@@ -6,7 +6,8 @@ export default function GitHubButton() {
 
   return (
     <button
-      onClick={()=>signIn('github')}
+      type="button"
+      onClick={() => signIn('github')}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={`w-3/5

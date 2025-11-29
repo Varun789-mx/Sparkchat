@@ -6,7 +6,8 @@ export default function GoogleButton() {
 
   return (
     <button
-    onClick={()=>signIn('google')}
+      type="button"
+      onClick={() => signIn('google')}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={`w-3/5

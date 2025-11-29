@@ -3,7 +3,7 @@ import { Typing } from "./Typing";
 import ReactMarkDown from "react-markdown";
 import { useMarkdown } from "../hooks/useMarkdown";
 import FirstMessage from "./FirstMessages";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Check, Copy } from "lucide-react";
 
 export default function ConversationBox() {
@@ -12,7 +12,20 @@ export default function ConversationBox() {
     const [copiedId, setcopiedId] = useState<string | null>(null);
     const messages = useChatStore((state) => state.messages);
     const setcredits = useChatStore((store) => store.setcredits)
+    const chatcontainerRef = useRef<HTMLDivElement>(null);
 
+    useEffect(() => {
+        const container = chatcontainerRef.current;
+        if (container) {
+            const isnearBottom =
+                container.scrollHeight - container.scrollTop - container.clientHeight <
+                100;
+
+            if (isnearBottom) {
+                container.scrollTop = container.scrollHeight;
+            }
+        }
+    }, [messages]);
 
     useEffect(() => {
         setcredits();
@@ -45,7 +58,7 @@ export default function ConversationBox() {
                                     : "justify-start"
                                     }`}
                             >
-                                <div className="message-container max-w-[95%] md:max-w-[85%]   flex flex-col justify-start gap-2 overflow-y-auto  scroll-auto ">
+                                <div ref={chatcontainerRef} className=" max-w-[95%] md:max-w-[85%]   flex flex-col justify-start gap-2 overflow-y-auto  scroll-auto ">
                                     <div
                                         className={`p-3 md:p-4 flex justify-center  rounded-xl ${msg.role === "user"
                                             ? "bg-gray-700  text-white"
