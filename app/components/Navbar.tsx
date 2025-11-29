@@ -7,6 +7,7 @@ import SideChatBar from "./SIdebar";
 import { useChatStore } from "@/hooks/useChatStore";
 import { ModelSelector } from "./ModelSelector";
 import ConversationBox from "./ConversationBox";
+import { Session } from "inspector/promises";
 
 export default function Navbar() {
   const [isTyping, setIsTyping] = useState(false);
@@ -45,7 +46,7 @@ export default function Navbar() {
       conversationId: conversationId,
       message: "",
     });
-    if (credits > 0) {
+    if (credits <= 0) {
       toast.error("Insufficient Credits")
       return;
     }

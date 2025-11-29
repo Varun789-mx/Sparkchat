@@ -35,6 +35,7 @@ export default function SideChatBar({
   useEffect(() => {
     if (conversationId) setConversationId(conversationId);
     FetchConversations();
+    console.log(session.data,"Session data");
   }, [conversationId]);
 
   return (
