@@ -49,16 +49,16 @@ export default function SignUpPage() {
                 return;
             }
 
-            // Show success message
+        
             setSuccess(true);
             console.log("✅ User created successfully!");
 
-            // Wait 1 second to show success message
+            
             await new Promise((resolve) => setTimeout(resolve, 1000));
 
             console.log("🔐 Auto-signing in...");
 
-            // Auto sign in after successful signup
+            
             const signInResult = await signIn("credentials", {
                 email: formData.email,
                 password: formData.password,
@@ -89,7 +89,7 @@ export default function SignUpPage() {
 
     return (
         <div className="relative flex items-center justify-center min-h-screen bg-gray-900 overflow-hidden">
-            <div className="flex md:w-4/5 w-full items-center justify-center bg-gray-900">
+            <div className="flex md:w-3/5 w-full items-center justify-center bg-gray-900">
                 {/* Main Form */}
                 <div className="w-full max-w-md p-8 flex flex-col justify-center">
                     <form onSubmit={handleSubmit}>
@@ -103,7 +103,7 @@ export default function SignUpPage() {
                         {/* Error Alert */}
                         {error && (
                             <div className="mt-4 p-3 bg-red-900/50 border border-red-500 rounded-lg flex items-start gap-2">
-                                <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                                <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
                                 <p className="text-sm text-red-200">{error}</p>
                             </div>
                         )}
@@ -111,7 +111,7 @@ export default function SignUpPage() {
                         {/* Success Alert */}
                         {success && (
                             <div className="mt-4 p-3 bg-green-900/50 border border-green-500 rounded-lg flex items-start gap-2 animate-pulse">
-                                <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                                <CheckCircle className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
                                 <p className="text-sm text-green-200">
                                     Account created successfully! Signing you in...
                                 </p>
@@ -275,7 +275,7 @@ export default function SignUpPage() {
             </div>
 
             {/* Image Section */}
-            <div className="hidden md:block md:w-1/2">
+            <div className="hidden md:block ">
                 <img
                     className="w-full h-screen object-cover"
                     src="https://images.unsplash.com/photo-1496917756835-20cb06e75b4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1908&q=80"
