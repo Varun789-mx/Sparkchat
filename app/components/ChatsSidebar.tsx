@@ -9,6 +9,7 @@ import {
   ChevronFirst,
   ChevronLast,
 } from "lucide-react";
+
 import { useSession } from "next-auth/react";
 import { signOut } from "next-auth/react";
 import { useChatStore } from "@/hooks/useChatStore";
@@ -36,24 +37,20 @@ export default function SideChatBar({
   useEffect(() => {
     if (conversationId) setConversationId(conversationId);
     FetchConversations();
-    console.log(session.data, "Session data");
-  }, [conversations]);
-
-  const UserData = {
-    name: session.data?.user.username,
-    image: session.data?.user.image,
-    isPremium: session.data?.user.ispremium,
-  }
-
+  }, [conversationId]);
   return (
-    <aside className={`h-screen border-r border-gray-800 ${SideBar ? "w-full md:w-60" : "w-0"} `}>
-
-      <nav className={`h-full flex flex-col overflow-hidden border-gray-800 shadow-sm  ${SideBar ? "w-full md:w-60" : "w-0"} `}>
-
+    <aside
+      className={`h-screen border-r border-gray-800 ${
+        SideBar ? "w-full md:w-60" : "w-0"
+      } `}
+    >
+      <nav
+        className={`h-full flex flex-col overflow-hidden border-gray-800 shadow-sm  ${
+          SideBar ? "w-full md:w-60" : "w-0"
+        } `}
+      >
         <div className={`p-4 border-b border-gray-800  `}>
-
           <div className="flex items-center justify-between mb-4">
-
             <h1 className="text-xl font-bold flex items-center gap-2">
               <MessageSquare className="w-6 h-6 text-orange-300" />
               <span className="text-orange-300">Spark AI</span>
@@ -62,7 +59,11 @@ export default function SideChatBar({
               onClick={() => setSideBar(!SideBar)}
               className=" p-2 hover:bg-gray-700  text-white rounded-lg"
             >
-              {SideBar ? <ChevronFirst className="w-5 h-5" /> : <ChevronLast className="w-5 h-5" />}
+              {SideBar ? (
+                <ChevronFirst className="w-5 h-5" />
+              ) : (
+                <ChevronLast className="w-5 h-5" />
+              )}
             </button>
           </div>
           <button
@@ -86,8 +87,9 @@ export default function SideChatBar({
             Chats {ShowChats ? <ChevronDown /> : <ChevronRight />}
           </button>
           <div
-            className={`w-50 border border-gray-800 p-3 overflow-y-auto flex-1 space-y-2 pr-2 ${Theme ? "bg-[#181818]" : "bg-white"
-              } `}
+            className={`w-50 border border-gray-800 p-3 overflow-y-auto flex-1 space-y-2 pr-2 ${
+              Theme ? "bg-[#181818]" : "bg-white"
+            } `}
           >
             {conversations.length > 0 ? (
               conversations.map((conversation, index) => {
@@ -101,11 +103,12 @@ export default function SideChatBar({
                     hidden={!ShowChats}
                   >
                     <div
-                      className={`border-none w-full  p-2  justify-center cursor-pointer hover:bg-gray-700 ${Theme
-                        ? "bg-[#181818] text-gray-300 text-sm border-t"
-                        : "bg-white text-gray-800"
-                        } rounded-xl`}
-                        onClick={() => {
+                      className={`border-none w-full  p-2  justify-center cursor-pointer hover:bg-gray-700 ${
+                        Theme
+                          ? "bg-[#181818] text-gray-300 text-sm border-t"
+                          : "bg-white text-gray-800"
+                      } rounded-xl`}
+                      onClick={() => {
                         const convid = conversation.id;
                         if (convid) {
                           loadingConversations(convid);
@@ -138,7 +141,7 @@ export default function SideChatBar({
               <button
                 onClick={() => {
                   signOut();
-                  reset()
+                  reset();
                   setisFooterOpen(!isFooterOpen);
                 }}
                 className="bg-gray-800  w-2/3 flex 
@@ -153,16 +156,29 @@ export default function SideChatBar({
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-gray-800 transition-colors`}
             >
               <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-medium">
-                {UserData.image ? <img className="rounded-full" src={UserData.image} alt="user" /> : UserData.name?.charAt(0).toUpperCase()}
+                {session.data?.user.image ? (
+                  <img
+                    className="rounded-full"
+                    src={session.data?.user.image}
+                    alt="user"
+                  />
+                ) : (
+                  session.data?.user.name?.charAt(0).toUpperCase()
+                )}
               </div>
               <div className="flex-1 text-left ">
                 <div className={`text-gray-200 font-medium text-sm`}>
-                  {UserData.name?.replace("_", " ")}
+                  {session.data?.user.name?.replace("_", " ")}
                 </div>
                 <div
                   className={`text-gray-300 text-xs w-full flex justify-start gap-4  `}
                 >
-                  {UserData.isPremium ? <p >Free Plan</p> : <p >Premium Plan</p>} <p>Credits:{credits.toString()}</p>
+                  {session.data?.user.ispremium ? (
+                    <p>Free Plan</p>
+                  ) : (
+                    <p>Premium Plan</p>
+                  )}{" "}
+                  <p>Credits:{credits.toString()}</p>
                 </div>
               </div>
               {isFooterOpen ? (
@@ -174,6 +190,6 @@ export default function SideChatBar({
           </div>
         </footer>
       </nav>
-    </aside >
+    </aside>
   );
 }

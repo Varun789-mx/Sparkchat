@@ -9,7 +9,12 @@ export default function FirstMessage() {
         <Sparkle className="w-7 h-7 text-white" />
       </div>
       <div className="flex justify-center flex-col items-center">
-        <p className="font-bold text-gray-200 text-xl md:4xl">Hello {session.data?.user.username.split(" ")[0]}</p>
+        <p className="font-bold text-gray-200 text-xl md:4xl">
+          Hello{" "}
+          {session.data?.user.name
+            ? session.data?.user.name.split(" ")[0]
+            : "User"}
+        </p>
         <p className="font-bold text-gray-200 text-lg md:4xl">
           {" "}
           How can i help you today ?
