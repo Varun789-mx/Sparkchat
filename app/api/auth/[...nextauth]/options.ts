@@ -17,6 +17,7 @@ export const authOptions: NextAuthOptions = {
           name: profile.name || profile.login,
           email: profile.email,
           image: profile.avatar_url,
+          username:profile.login,
           ispremium: false,
         }
       }
@@ -30,6 +31,7 @@ export const authOptions: NextAuthOptions = {
           name: profile.name,
           email: profile.email,
           image: profile.picture,
+          username:profile.login,
           ispremium: false
         }
       }
