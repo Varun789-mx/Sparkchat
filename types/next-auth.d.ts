@@ -28,4 +28,11 @@ declare module 'next-auth/jwt' {
         image?: string,
         ispremium: boolean
     }
+    interface profile {
+        id: string,
+        email: string,
+        name: string,
+        image?: string,
+        ispremium?: boolean
+    }
 }

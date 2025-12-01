@@ -31,15 +31,6 @@ export default function Navbar() {
       }
     }
   }, [messages]);
-
-  useEffect(() => {
-    const existingId =
-      localStorage.getItem("conversationId") || crypto.randomUUID();
-    localStorage.setItem("conversationId", existingId);
-    setconversationId(existingId);
-  }, []);
-
-
   return (
     <>
       <div className="flex h-screen bg-[#111111]  text-gray-200">

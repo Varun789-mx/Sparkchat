@@ -4,16 +4,37 @@ import bcrypt from "bcryptjs";
 import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 import { prisma } from '@/lib/prisma'
+import { fa } from "zod/v4/locales";
 
 export const authOptions: NextAuthOptions = {
   providers: [
     GitHubProvider({
       clientId: process.env.GITHUB_ID || "",
       clientSecret: process.env.GITHUB_SECRET || "",
+      profile(profile) {
+        console.log("GitHub Profile:", profile); // Debug log
+        return {
+          id: profile.id.toString(),
+          name: profile.name || profile.login,
+          email: profile.email,
+          image: profile.avatar_url,
+          ispremium: false,
+        }
+      }
     }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      profile(profile) {
+        console.log("Google Profile:", profile); // Debug log
+        return {
+          id: profile.sub,
+          name: profile.name,
+          email: profile.email,
+          image: profile.picture,
+          ispremium: false
+        }
+      }
     }),
     CredentialsProvider({
       id: "credentials",
@@ -63,15 +84,17 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user, account, profile }) {
       if (account?.provider === 'google' || account?.provider === 'github') {
         try {
+          console.log("User object in signIn:", user); // Add this debug log
+
           if (!user.email) {
-            console.log("No email in provided by the Oauth provider")
+            console.log("No email provided by OAuth provider")
             return false;
           }
+
           const existingUser = await prisma.user.findUnique({
-            where: {
-              email: user.email
-            }
+            where: { email: user.email }
           })
+
           if (existingUser) {
             const existingAccount = await prisma.account.findUnique({
               where: {
@@ -81,6 +104,12 @@ export const authOptions: NextAuthOptions = {
                 }
               }
             })
+            if (user.image && user.image !== existingUser.image) {
+              await prisma.user.update({
+                where: { id: existingUser.id },
+                data: { image: user.image }
+              })
+            }
             if (!existingAccount) {
               await prisma.account.create({
                 data: {
@@ -105,7 +134,7 @@ export const authOptions: NextAuthOptions = {
                 email: user.email,
                 username: user.name || user.email.split("@")[0] || 'user',
                 password: null,
-                image: user.image,
+                image: user.image, // Make sure this is being passed
               }
             })
             await prisma.account.create({
@@ -143,7 +172,7 @@ export const authOptions: NextAuthOptions = {
           token.id = dbUser.id;
           token.email = dbUser.email;
           token.username = dbUser.username;
-          token.image = dbUser.image || "";
+          token.image = dbUser.image ?? undefined;
           token.ispremium = dbUser.isPremium;
         }
       }

@@ -24,7 +24,7 @@ model User {
   conversations Conversation[]
   updatedAt     DateTime       @updatedAt
   apps          App[]
-  accounts Account[]
+  accounts      Account[]
 }
 
 model Account {
@@ -41,8 +41,9 @@ model Account {
   id_token          String? @db.Text
   session_state     String?
 
-  user User  @relation(fields: [userId],references: [id],onDelete: Cascade) 
-  @@unique([provider,providerAccountId])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
 }
 
 model Execution {
