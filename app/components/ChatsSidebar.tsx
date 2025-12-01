@@ -46,10 +46,14 @@ export default function SideChatBar({
   }
 
   return (
-    <aside className={`h-screen ${SideBar ? "w-full md:w-60":"w-0"} `}>
-      <nav className={`h-full flex flex-col  border-gray-800 shadow-sm `}>
+    <aside className={`h-screen border-r border-gray-800 ${SideBar ? "w-full md:w-60" : "w-0"} `}>
+
+      <nav className={`h-full flex flex-col overflow-hidden border-gray-800 shadow-sm  ${SideBar ? "w-full md:w-60" : "w-0"} `}>
+
         <div className={`p-4 border-b border-gray-800  `}>
+
           <div className="flex items-center justify-between mb-4">
+
             <h1 className="text-xl font-bold flex items-center gap-2">
               <MessageSquare className="w-6 h-6 text-orange-300" />
               <span className="text-orange-300">Spark AI</span>
@@ -62,7 +66,7 @@ export default function SideChatBar({
             </button>
           </div>
           <button
-            className={`overflow-hidden w-full duration-200  p-1.5 bg-orange-500 hover:bg-orange-700 text-white rounded-lg py-3 px-4 flex items-center justify-center gap-2 font-medium transition-colors  `}
+            className={`overflow-hidden w-50  duration-200  p-1.5 bg-orange-500 hover:bg-orange-700 text-white rounded-lg py-3 px-4 flex items-center justify-center gap-2 font-medium transition-colors  `}
             onClick={() => {
               reset();
               FetchConversations();
@@ -82,7 +86,7 @@ export default function SideChatBar({
             Chats {ShowChats ? <ChevronDown /> : <ChevronRight />}
           </button>
           <div
-            className={`w-60 border border-gray-800 p-3 overflow-y-auto flex-1 space-y-2 pr-2 ${Theme ? "bg-[#181818]" : "bg-white"
+            className={`w-50 border border-gray-800 p-3 overflow-y-auto flex-1 space-y-2 pr-2 ${Theme ? "bg-[#181818]" : "bg-white"
               } `}
           >
             {conversations.length > 0 ? (
@@ -97,11 +101,11 @@ export default function SideChatBar({
                     hidden={!ShowChats}
                   >
                     <div
-                      className={`border-none w-full  p-2 justify-center cursor-pointer hover:bg-gray-700 ${Theme
+                      className={`border-none w-full  p-2  justify-center cursor-pointer hover:bg-gray-700 ${Theme
                         ? "bg-[#181818] text-gray-300 text-sm border-t"
                         : "bg-white text-gray-800"
                         } rounded-xl`}
-                      onClick={() => {
+                        onClick={() => {
                         const convid = conversation.id;
                         if (convid) {
                           loadingConversations(convid);
@@ -110,7 +114,7 @@ export default function SideChatBar({
                         }
                       }}
                     >
-                      {firstUserMessage?.content?.substring(0, 28) ||
+                      {firstUserMessage?.content?.substring(0, 25) ||
                         "New Conversation"}
                       ..
                     </div>
@@ -148,7 +152,7 @@ export default function SideChatBar({
               onClick={() => setisFooterOpen(!isFooterOpen)}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-gray-800 transition-colors`}
             >
-              <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-medium">
+              <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-medium">
                 {UserData.image ? <img className="rounded-full" src={UserData.image} alt="user" /> : UserData.name?.charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 text-left ">
@@ -156,9 +160,9 @@ export default function SideChatBar({
                   {UserData.name?.replace("_", " ")}
                 </div>
                 <div
-                  className={`text-gray-300 text-xs flex justify-start gap-4  `}
+                  className={`text-gray-300 text-xs w-full flex justify-start gap-4  `}
                 >
-                  {UserData.isPremium ? <p>Free Plan</p> : <p>Premium Plan</p>} <p>Credits: {credits.toString()}</p>
+                  {UserData.isPremium ? <p >Free Plan</p> : <p >Premium Plan</p>} <p>Credits:{credits.toString()}</p>
                 </div>
               </div>
               {isFooterOpen ? (
