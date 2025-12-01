@@ -12,7 +12,6 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.GITHUB_ID || "",
       clientSecret: process.env.GITHUB_SECRET || "",
       profile(profile) {
-        console.log("GitHub Profile:", profile); // Debug log
         return {
           id: profile.id.toString(),
           name: profile.name || profile.login,
@@ -26,7 +25,6 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.GOOGLE_CLIENT_ID || "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
       profile(profile) {
-        console.log("Google Profile:", profile); // Debug log
         return {
           id: profile.sub,
           name: profile.name,
