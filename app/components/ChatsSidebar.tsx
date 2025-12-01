@@ -8,6 +8,10 @@ import {
   LogOut,
   ChevronFirst,
   ChevronLast,
+  Dot,
+  Ellipsis,
+  Delete,
+  Trash2,
 } from "lucide-react";
 
 import { useSession } from "next-auth/react";
@@ -23,6 +27,7 @@ export default function SideChatBar({
 }) {
   const session = useSession();
   const Theme = true;
+  const [ShowDelete, setShowDelete] = useState(false);
   const { setConversationId, conversationId } = useChatStore();
   const credits = useChatStore((state) => state.credits);
   const reset = useChatStore((state) => state.reset);
@@ -40,14 +45,12 @@ export default function SideChatBar({
   }, [conversationId]);
   return (
     <aside
-      className={`h-screen border-r border-gray-800 ${
-        SideBar ? "w-full md:w-60" : "w-0"
-      } `}
+      className={`h-screen border-r border-gray-800 ${SideBar ? "w-full md:w-60" : "w-0"
+        } `}
     >
       <nav
-        className={`h-full flex flex-col overflow-hidden border-gray-800 shadow-sm  ${
-          SideBar ? "w-full md:w-60" : "w-0"
-        } `}
+        className={`h-full flex flex-col overflow-hidden border-gray-800 shadow-sm  ${SideBar ? "w-full md:w-60" : "w-0"
+          } `}
       >
         <div className={`p-4 border-b border-gray-800  `}>
           <div className="flex items-center justify-between mb-4">
@@ -87,9 +90,8 @@ export default function SideChatBar({
             Chats {ShowChats ? <ChevronDown /> : <ChevronRight />}
           </button>
           <div
-            className={`w-50 border border-gray-800 p-3 overflow-y-auto flex-1 space-y-2 pr-2 ${
-              Theme ? "bg-[#181818]" : "bg-white"
-            } `}
+            className={`w-60 h-[80%] border border-gray-800p-2 overflow-y-auto flex-1 space-y-2 pr-2 ${Theme ? "bg-[#181818]" : "bg-white"
+              } `}
           >
             {conversations.length > 0 ? (
               conversations.map((conversation, index) => {
@@ -102,25 +104,33 @@ export default function SideChatBar({
                     key={index}
                     hidden={!ShowChats}
                   >
-                    <div
-                      className={`border-none w-full  p-2  justify-center cursor-pointer hover:bg-gray-700 ${
-                        Theme
+                    <div className="flex p-1 overflow-y-auto cursor-pointer justify-between items-center hover:bg-gray-700 rounded-lg ">
+                      <div
+                        className={`hover:bg-gray-700  cursor-pointer${Theme
                           ? "bg-[#181818] text-gray-300 text-sm border-t"
                           : "bg-white text-gray-800"
-                      } rounded-xl`}
-                      onClick={() => {
-                        const convid = conversation.id;
-                        if (convid) {
-                          loadingConversations(convid);
-                        } else {
-                          console.log("No conversationId");
-                        }
-                      }}
-                    >
-                      {firstUserMessage?.content?.substring(0, 25) ||
-                        "New Conversation"}
-                      ..
+                          } rounded-xl`}
+                        onClick={() => {
+                          const convid = conversation.id;
+                          if (convid) {
+                            loadingConversations(convid);
+                          } else {
+                            console.log("No conversationId");
+                          }
+                        }}
+                      >
+                        {firstUserMessage?.content?.substring(0, 25) ||
+                          "New Conversation"}
+                        ..
+
+                      </div>
+                      <div className="flex flex-col">
+                        {/* <div hidden={ShowDelete} className="flex justify-end w-10 h-10 p-2 items-center rounded-xl bg-gray-500"><Trash2 /></div> */}
+                        <button onClick={(() => setShowDelete(!ShowDelete))}><Ellipsis className="w-4" /></button>
+                      </div>
+
                     </div>
+
                   </div>
                 );
               })
