@@ -17,10 +17,10 @@ async function main() {
 
   // Create users
   const hashedPassword = await bcrypt.hash('password123', 10);
-  
+
   const user1 = await prisma.user.create({
     data: {
-      username: 'john_doe',
+      name: 'john_doe',
       email: 'john@example.com',
       password: hashedPassword,
       credits: 10,
@@ -30,7 +30,7 @@ async function main() {
 
   const user2 = await prisma.user.create({
     data: {
-      username: 'jane_smith',
+      name: 'jane_smith',
       email: 'jane@example.com',
       password: hashedPassword,
       credits: 3,
@@ -80,11 +80,11 @@ async function main() {
 
   // Create multiple executions with varied types
   const executionTypes = ['CONVERSATION', 'ARTICLE_SUMMARIZER', 'WEBSITE_CREATOR'] as const;
-  
+
   for (let i = 5; i <= 25; i++) {
     const typeIndex = i % 3;
     const type = executionTypes[typeIndex];
-    
+
     await prisma.execution.create({
       data: {
         title: `${type.replace('_', ' ').toLowerCase()} ${i}`,

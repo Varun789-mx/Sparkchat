@@ -90,7 +90,7 @@ export default function SideChatBar({
             Chats {ShowChats ? <ChevronDown /> : <ChevronRight />}
           </button>
           <div
-            className={`w-60 h-[80%] border border-gray-800p-2 overflow-y-auto flex-1 space-y-2 pr-2 ${Theme ? "bg-[#181818]" : "bg-white"
+            className={`w-60 h-[80%] border border-gray-800 p-2 overflow-y-auto flex-1 space-y-2 pr-2 ${Theme ? "bg-[#181818]" : "bg-white"
               } `}
           >
             {conversations.length > 0 ? (
@@ -107,7 +107,7 @@ export default function SideChatBar({
                     <div className="flex p-1 overflow-y-auto cursor-pointer justify-between items-center hover:bg-gray-700 rounded-lg ">
                       <div
                         className={`hover:bg-gray-700  cursor-pointer${Theme
-                          ? "bg-[#181818] text-gray-300 text-sm border-t"
+                          ? "bg-[#181818] text-gray-300 text-sm"
                           : "bg-white text-gray-800"
                           } rounded-xl`}
                         onClick={() => {

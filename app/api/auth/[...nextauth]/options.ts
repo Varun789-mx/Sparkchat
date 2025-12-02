@@ -17,7 +17,6 @@ export const authOptions: NextAuthOptions = {
           name: profile.name || profile.login,
           email: profile.email,
           image: profile.avatar_url,
-          username:profile.login,
           ispremium: false,
         }
       }
@@ -31,7 +30,6 @@ export const authOptions: NextAuthOptions = {
           name: profile.name,
           email: profile.email,
           image: profile.picture,
-          username:profile.login,
           ispremium: false
         }
       }
@@ -41,7 +39,7 @@ export const authOptions: NextAuthOptions = {
       name: "Credentials",
       credentials: {
         email: {
-          label: "Username",
+          label: "name",
           type: "text",
           placeholder: "Johndoe@gmail.com",
         },
@@ -68,7 +66,7 @@ export const authOptions: NextAuthOptions = {
           return {
             id: User.id,
             email: User.email,
-            username: User.username,
+            name: User.name,
             image: User.image ?? undefined,
             ispremium: User.isPremium,
           };
@@ -132,7 +130,7 @@ export const authOptions: NextAuthOptions = {
             const NewUser = await prisma.user.create({
               data: {
                 email: user.email,
-                username: user.name || user.email.split("@")[0] || 'user',
+                name: user.name || user.email.split("@")[0] || 'user',
                 password: null,
                 image: user.image, // Make sure this is being passed
               }
@@ -171,7 +169,7 @@ export const authOptions: NextAuthOptions = {
         if (dbUser) {
           token.id = dbUser.id;
           token.email = dbUser.email;
-          token.username = dbUser.username;
+          token.name = dbUser.name;
           token.image = dbUser.image ?? undefined;
           token.ispremium = dbUser.isPremium;
         }
@@ -179,7 +177,7 @@ export const authOptions: NextAuthOptions = {
       else if (user) {
         token.id = user.id,
           token.email = user.email;
-        token.username = user.username;
+        token.name = user.name;
         token.image = user.image;
         token.ispremium = user.ispremium;
       }
@@ -189,7 +187,7 @@ export const authOptions: NextAuthOptions = {
       if (token) {
         session.user.id = token.id;
         session.user.email = token.email;
-        session.user.username = token.username;
+        session.user.name = token.name;
         session.user.image = token.image;
         session.user.ispremium = token.ispremium;
       }

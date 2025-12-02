@@ -9,7 +9,7 @@ import { signUpUser } from "@/app/actions/auth";
 export default function SignUpPage() {
     const router = useRouter();
     const [formData, setFormData] = useState({
-        username: "",
+        name: "",
         email: "",
         password: "",
         confirmPassword: "",
@@ -119,22 +119,22 @@ export default function SignUpPage() {
                         )}
 
                         <div className="mt-6 space-y-4">
-                            {/* Username Field */}
+                            {/* name Field */}
                             <div className="w-full">
                                 <label
                                     className="text-sm font-bold text-white block mb-2"
-                                    htmlFor="username"
+                                    htmlFor="name"
                                 >
-                                    Username
+                                    name
                                 </label>
                                 <input
                                     type="text"
-                                    id="username"
-                                    name="username"
+                                    id="name"
+                                    name="name"
                                     className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg block w-full p-2.5 placeholder-gray-400 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all duration-100"
                                     onChange={handleFormData}
                                     disabled={loading || success}
-                                    value={formData.username}
+                                    value={formData.name}
                                     placeholder="johndoe"
                                     required
                                 />

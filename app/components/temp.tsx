@@ -44,10 +44,10 @@ export const Chatlist = () => {
                     <div className={`p-3 border-t border-gray-800`}>
                         <button className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-gray-800 transition-colors`}>
                             <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-medium">
-                                {session.data?.user.username?.charAt(0).toUpperCase()}
+                                {session.data?.user.name?.charAt(0).toUpperCase()}
                             </div>
                             <div className="flex-1 text-left ">
-                                <div className={`text-gray-900 font-medium text-sm`}>{session.data?.user.username?.replace("_", " ")}</div>
+                                <div className={`text-gray-900 font-medium text-sm`}>{session.data?.user.name?.replace("_", " ")}</div>
                                 <div className={`text-gray-500 text-xs`}>Free Plan</div>
                             </div>
                             <ChevronDown className={`w-4 h-4 text-gray-500`} />

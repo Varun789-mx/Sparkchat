@@ -6,17 +6,17 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export async function signUpUser(formData: {
-  username: string;
+  name: string;
   email: string;
   password: string;
   confirmPassword: string;
 }) {
   try {
     // Validation
-    if (!formData.username || formData.username.length < 3) {
+    if (!formData.name || formData.name.length < 3) {
       return {
         success: false,
-        error: "Username must be at least 3 characters long",
+        error: "name must be at least 3 characters long",
       };
     }
 
@@ -55,16 +55,16 @@ export async function signUpUser(formData: {
       };
     }
 
-    const existingUserByUsername = await prisma.user.findFirst({
+    const existingUserByname = await prisma.user.findFirst({
       where: {
-        username: formData.username,
+        name: formData.name,
       },
     });
 
-    if (existingUserByUsername) {
+    if (existingUserByname) {
       return {
         success: false,
-        error: "Username is already taken",
+        error: "name is already taken",
       };
     }
 
@@ -74,7 +74,7 @@ export async function signUpUser(formData: {
     // Create user
     const user = await prisma.user.create({
       data: {
-        username: formData.username,
+        name: formData.name,
         email: formData.email,
         password: hashedPassword,
       },
@@ -87,7 +87,7 @@ export async function signUpUser(formData: {
       user: {
         id: user.id,
         email: user.email,
-        username: user.username,
+        name: user.name,
       },
     };
   } catch (error: any) {
