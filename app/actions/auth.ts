@@ -1,9 +1,7 @@
 "use server";
 
 import { hash } from "bcryptjs";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
 
 export async function signUpUser(formData: {
   name: string;
@@ -55,18 +53,18 @@ export async function signUpUser(formData: {
       };
     }
 
-    const existingUserByname = await prisma.user.findFirst({
-      where: {
-        name: formData.name,
-      },
-    });
+    // const existingUserByname = await prisma.user.findFirst({
+    //   where: {
+    //     name: formData.name,
+    //   },
+    // });
 
-    if (existingUserByname) {
-      return {
-        success: false,
-        error: "name is already taken",
-      };
-    }
+    // if (existingUserByname) {
+    //   return {
+    //     success: false,
+    //     error: "Username is already taken",
+    //   };
+    // }
 
     // Hash password
     const hashedPassword = await hash(formData.password, 12);
