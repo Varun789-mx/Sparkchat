@@ -1,4 +1,4 @@
-"use server"
+"use server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
@@ -68,7 +68,7 @@ export async function POST(req: Request) {
   const userid = session.user.id;
   const Getuser = await prisma.user.findUnique({
     where: {
-      id: session.user.id,
+      id: userid,
     },
   });
 
@@ -116,8 +116,8 @@ export async function POST(req: Request) {
 
   if (!execution) {
     const existingConversation = await prisma.conversation.findUnique({
-      where: { id: conversationId }
-    })
+      where: { id: conversationId },
+    });
 
     await prisma.$transaction([
       prisma.execution.create({
@@ -129,13 +129,14 @@ export async function POST(req: Request) {
           externalId: conversationId,
         },
       }),
-      !existingConversation ?
-        prisma.conversation.create({
-          data: {
-            id: conversationId,
-            userId: session.user.id
-          },
-        }) : prisma.$executeRaw`SELECT 1`
+      !existingConversation
+        ? prisma.conversation.create({
+            data: {
+              id: conversationId,
+              userId: session.user.id,
+            },
+          })
+        : prisma.$executeRaw`SELECT 1`,
     ]);
   }
 
@@ -217,7 +218,7 @@ export async function POST(req: Request) {
     headers: {
       "Content-Type": "text/event-stream; charset=utf-8",
       "Cache-Control": "no-cache, no-transform",
-      "Connection": "keep-alive",
+      Connection: "keep-alive",
       "Transfer-Encoding": "chunked",
     },
   });

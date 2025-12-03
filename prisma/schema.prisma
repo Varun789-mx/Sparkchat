@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,18 +10,18 @@ datasource db {
 
 model User {
   id            String         @id @default(uuid())
-  name          String
+  username      String
   email         String         @unique
   credits       Int            @default(3)
   password      String?
-  image         String?
   isPremium     Boolean        @default(false)
   createdAt     DateTime       @default(now())
-  executions    Execution[]
-  conversations Conversation[]
   updatedAt     DateTime       @updatedAt
-  apps          App[]
+  image         String?
   accounts      Account[]
+  apps          App[]
+  conversations Conversation[]
+  executions    Execution[]
 }
 
 model Account {
@@ -33,15 +30,14 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -52,9 +48,42 @@ model Execution {
   type       ExecutionType
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @updatedAt
-  user       User          @relation(fields: [userId], references: [id])
   userId     String
   externalId String?
+  user       User          @relation(fields: [userId], references: [id])
+}
+
+model Conversation {
+  id        String    @id @default(uuid())
+  userId    String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  apps      App[]
+  user      User      @relation(fields: [userId], references: [id])
+  messages  Message[]
+}
+
+model App {
+  id             String       @id @default(uuid())
+  name           String
+  description    String
+  icon           String
+  userId         String
+  conversationId String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  user           User         @relation(fields: [userId], references: [id])
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  conversationId String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  role           ROLE
+  content        String
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
 }
 
 enum ExecutionType {
@@ -66,37 +95,4 @@ enum ExecutionType {
 enum ROLE {
   user
   assistant
-}
-
-model Conversation {
-  id        String    @id @default(uuid())
-  user      User      @relation(fields: [userId], references: [id])
-  userId    String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  messages  Message[]
-  apps      App[]
-}
-
-model App {
-  id             String       @id @default(uuid())
-  name           String
-  description    String
-  icon           String
-  user           User         @relation(fields: [userId], references: [id])
-  userId         String
-  conversationId String
-  conversation   Conversation @relation(fields: [conversationId], references: [id])
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-}
-
-model Message {
-  id             String       @id @default(uuid())
-  conversationId String
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  role           ROLE
-  content        String
-  conversation   Conversation @relation(fields: [conversationId], references: [id])
 }
