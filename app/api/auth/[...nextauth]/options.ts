@@ -63,11 +63,12 @@ export const authOptions: NextAuthOptions = {
           if (!User.password) {
             throw new Error("Please Sign in with google or github");
           }
+           RateLimiter.consume(User.password, 2);
           const VerifyPass = await bcrypt.compare(
             credentials.password,
             User.password
           );
-          RateLimiter.consume(User.id, 2);
+         
           if (!VerifyPass) {
             throw new Error("Invalid Credentials");
           }
