@@ -51,6 +51,11 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials: any) {
         try {
+          await RateLimiter.consume(credentials.email, 2);
+        } catch (RateLimiterError) {
+          console.log(`Too many request try again later`, RateLimiterError);
+        }
+        try {
           const User = await prisma.user.findUnique({
             where: {
               email: credentials.email,
@@ -63,12 +68,12 @@ export const authOptions: NextAuthOptions = {
           if (!User.password) {
             throw new Error("Please Sign in with google or github");
           }
-           RateLimiter.consume(User.password, 2);
+          RateLimiter.consume(User.password, 2);
           const VerifyPass = await bcrypt.compare(
             credentials.password,
             User.password
           );
-         
+
           if (!VerifyPass) {
             throw new Error("Invalid Credentials");
           }
@@ -158,7 +163,7 @@ export const authOptions: NextAuthOptions = {
             return true;
           }
         } catch (error) {
-          console.log("Error in creating or find the user", error);
+          console.log("Error", error);
           return false;
         }
       }
