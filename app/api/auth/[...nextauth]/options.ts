@@ -3,8 +3,12 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
-import { prisma } from '@/lib/prisma'
-import { fa } from "zod/v4/locales";
+import { prisma } from "@/lib/prisma";
+import { RateLimiterMemory } from "rate-limiter-flexible";
+const RateLimiter = new RateLimiterMemory({
+  points: 5,
+  duration: 60,
+});
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -18,8 +22,8 @@ export const authOptions: NextAuthOptions = {
           email: profile.email,
           image: profile.avatar_url,
           ispremium: false,
-        }
-      }
+        };
+      },
     }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || "",
@@ -30,9 +34,9 @@ export const authOptions: NextAuthOptions = {
           name: profile.name,
           email: profile.email,
           image: profile.picture,
-          ispremium: false
-        }
-      }
+          ispremium: false,
+        };
+      },
     }),
     CredentialsProvider({
       id: "credentials",
@@ -50,18 +54,22 @@ export const authOptions: NextAuthOptions = {
           const User = await prisma.user.findUnique({
             where: {
               email: credentials.email,
-            }
-          })
+            },
+          });
           if (!User) {
-            console.log("User Doesn't exist,Please Login")
+            console.log("User Doesn't exist,Please Login");
             return null;
           }
           if (!User.password) {
             throw new Error("Please Sign in with google or github");
           }
-          const VerifyPass = await bcrypt.compare(credentials.password, User.password);
+          const VerifyPass = await bcrypt.compare(
+            credentials.password,
+            User.password
+          );
+          RateLimiter.consume(User.id, 2);
           if (!VerifyPass) {
-            throw new Error("Invalid Credentials")
+            throw new Error("Invalid Credentials");
           }
           return {
             id: User.id,
@@ -70,43 +78,39 @@ export const authOptions: NextAuthOptions = {
             image: User.image ?? undefined,
             ispremium: User.isPremium,
           };
-        }
-        catch (error: any) {
-          throw new Error(error.message || "Authentication Failed");
+        } catch (error: any) {
+          console.log("To many attempts");
           return null;
         }
-      }
+      },
     }),
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
-      if (account?.provider === 'google' || account?.provider === 'github') {
+      if (account?.provider === "google" || account?.provider === "github") {
         try {
-          console.log("User object in signIn:", user); // Add this debug log
-
           if (!user.email) {
-            console.log("No email provided by OAuth provider")
             return false;
           }
 
           const existingUser = await prisma.user.findUnique({
-            where: { email: user.email }
-          })
+            where: { email: user.email },
+          });
 
           if (existingUser) {
             const existingAccount = await prisma.account.findUnique({
               where: {
                 provider_providerAccountId: {
                   provider: account.provider,
-                  providerAccountId: account.providerAccountId
-                }
-              }
-            })
+                  providerAccountId: account.providerAccountId,
+                },
+              },
+            });
             if (user.image && user.image !== existingUser.image) {
               await prisma.user.update({
                 where: { id: existingUser.id },
-                data: { image: user.image }
-              })
+                data: { image: user.image },
+              });
             }
             if (!existingAccount) {
               await prisma.account.create({
@@ -121,8 +125,8 @@ export const authOptions: NextAuthOptions = {
                   token_type: account.token_type,
                   scope: account.scope,
                   id_token: account.id_token,
-                  session_state: account.session_state
-                }
+                  session_state: account.session_state,
+                },
               });
             }
             return true;
@@ -130,11 +134,11 @@ export const authOptions: NextAuthOptions = {
             const NewUser = await prisma.user.create({
               data: {
                 email: user.email,
-                name: user.name || user.email.split("@")[0] || 'user',
+                name: user.name || user.email.split("@")[0] || "user",
                 password: null,
                 image: user.image, // Make sure this is being passed
-              }
-            })
+              },
+            });
             await prisma.account.create({
               data: {
                 userId: NewUser.id,
@@ -147,9 +151,9 @@ export const authOptions: NextAuthOptions = {
                 token_type: account.token_type,
                 scope: account.scope,
                 id_token: account.id_token,
-                session_state: account.session_state
-              }
-            })
+                session_state: account.session_state,
+              },
+            });
             return true;
           }
         } catch (error) {
@@ -160,12 +164,12 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
     async jwt({ token, user, account }) {
-      if (account?.provider === 'google' || account?.provider === 'github') {
+      if (account?.provider === "google" || account?.provider === "github") {
         const dbUser = await prisma.user.findUnique({
           where: {
-            email: token.email
-          }
-        })
+            email: token.email,
+          },
+        });
         if (dbUser) {
           token.id = dbUser.id;
           token.email = dbUser.email;
@@ -173,10 +177,8 @@ export const authOptions: NextAuthOptions = {
           token.image = dbUser.image ?? undefined;
           token.ispremium = dbUser.isPremium;
         }
-      }
-      else if (user) {
-        token.id = user.id,
-          token.email = user.email;
+      } else if (user) {
+        (token.id = user.id), (token.email = user.email);
         token.name = user.name;
         token.image = user.image;
         token.ispremium = user.ispremium;
@@ -191,14 +193,14 @@ export const authOptions: NextAuthOptions = {
         session.user.image = token.image;
         session.user.ispremium = token.ispremium;
       }
-      return session
-    }
+      return session;
+    },
   },
   pages: {
-    signIn: '/signin'
+    signIn: "/signin",
   },
   session: {
-    strategy: "jwt"
+    strategy: "jwt",
   },
   secret: process.env.NEXTAUTH_SECRET,
 };

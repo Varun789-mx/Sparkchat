@@ -7,6 +7,7 @@ import GoogleBtn from "../components/GoogleBtn";
 import { signIn } from "next-auth/react";
 import GitHubButton from "../components/Githubbtn";
 import toast, { Toaster } from "react-hot-toast";
+import { error } from "console";
 
 export default function Signup() {
   const router = useRouter();
@@ -57,7 +58,7 @@ export default function Signup() {
         return;
       }
       if (signinResult?.status == 401) {
-        setsuccess(false);
+        toast.error(signinResult.error);
       }
       if (signinResult?.ok) {
         router.push("/chat");

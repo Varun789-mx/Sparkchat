@@ -1,0 +1,54 @@
+
+> chat-app@0.1.0 dev
+> next dev
+
+   ▲ Next.js 16.0.0 (Turbopack)
+   - Local:        http://localhost:3000
+   - Network:      http://172.21.176.1:3000
+   - Environments: .env
+
+ ✓ Starting...
+ ✓ Ready in 1245ms
+ GET /signin 200 in 2.4s (compile: 2.1s, proxy.ts: 144ms, render: 222ms)
+ GET /api/auth/session 200 in 1496ms (compile: 1454ms, render: 41ms)
+ GET /api/auth/providers 200 in 37ms (compile: 16ms, render: 22ms)
+ GET /api/auth/csrf 200 in 11ms (compile: 4ms, render: 7ms)
+ POST /api/auth/callback/credentials 401 in 1794ms (compile: 3ms, render: 1791ms)
+ GET /api/auth/providers 200 in 48ms (compile: 11ms, render: 36ms)
+ GET /api/auth/csrf 200 in 12ms (compile: 3ms, render: 9ms)
+ POST /api/auth/callback/credentials 401 in 274ms (compile: 2ms, render: 272ms)
+ GET /api/auth/providers 200 in 48ms (compile: 14ms, render: 34ms)
+ GET /api/auth/csrf 200 in 43ms (compile: 3ms, render: 40ms)
+ POST /api/auth/callback/credentials 401 in 231ms (compile: 2ms, render: 229ms)
+ GET /signin 200 in 77ms (compile: 9ms, proxy.ts: 6ms, render: 62ms)
+ GET /api/auth/session 200 in 48ms (compile: 22ms, render: 26ms)
+ GET /api/auth/session 200 in 36ms (compile: 4ms, render: 32ms)
+ GET /api/auth/providers 200 in 47ms (compile: 12ms, render: 35ms)
+ GET /api/auth/csrf 200 in 42ms (compile: 4ms, render: 38ms)
+ POST /api/auth/callback/credentials 401 in 4.4s (compile: 2ms, render: 4.4s)
+ GET /api/auth/providers 200 in 34ms (compile: 12ms, render: 23ms)
+ GET /api/auth/csrf 200 in 24ms (compile: 2ms, render: 21ms)
+ POST /api/auth/callback/credentials 401 in 225ms (compile: 2ms, render: 223ms)
+ GET /api/auth/providers 200 in 44ms (compile: 11ms, render: 33ms)
+ GET /api/auth/csrf 200 in 26ms (compile: 3ms, render: 23ms)
+ POST /api/auth/callback/credentials 401 in 235ms (compile: 3ms, render: 232ms)
+ GET /api/auth/providers 200 in 33ms (compile: 12ms, render: 22ms)
+ GET /api/auth/csrf 200 in 22ms (compile: 4ms, render: 18ms)
+ POST /api/auth/callback/credentials 401 in 448ms (compile: 3ms, render: 445ms)
+ GET /api/auth/providers 200 in 47ms (compile: 13ms, render: 34ms)
+ GET /api/auth/csrf 200 in 9ms (compile: 3ms, render: 6ms)
+ POST /api/auth/callback/credentials 401 in 578ms (compile: 1939µs, render: 576ms)
+ GET /api/auth/providers 200 in 20ms (compile: 4ms, render: 16ms)
+ GET /api/auth/csrf 200 in 14ms (compile: 1806µs, render: 12ms)
+ POST /api/auth/callback/credentials 401 in 241ms (compile: 1865µs, render: 239ms)
+ GET /api/auth/providers 200 in 34ms (compile: 11ms, render: 23ms)
+ GET /api/auth/csrf 200 in 11ms (compile: 2ms, render: 9ms)
+ POST /api/auth/callback/credentials 401 in 220ms (compile: 2ms, render: 218ms)
+ GET /api/auth/providers 200 in 8ms (compile: 2ms, render: 6ms)
+ GET /api/auth/csrf 200 in 25ms (compile: 1680µs, render: 23ms)
+ POST /api/auth/callback/credentials 401 in 212ms (compile: 1665µs, render: 210ms)
+ GET /api/auth/providers 200 in 151ms (compile: 130ms, render: 21ms)
+ GET /api/auth/csrf 200 in 14ms (compile: 4ms, render: 9ms)
+To many attempts
+ POST /api/auth/callback/credentials 401 in 1605ms (compile: 4ms, render: 1602ms)
+[?25h
