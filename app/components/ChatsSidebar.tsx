@@ -117,7 +117,6 @@ export default function SideChatBar({
             )}
           </div>
         </div>
-
         {/* Footer */}
         <div className="border-t border-white/8 p-2">
           {showFooterMenu && (
