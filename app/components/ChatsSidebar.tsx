@@ -10,6 +10,8 @@ import {
   ChevronLast,
   Ellipsis,
   Dot,
+  Circle,
+  DotIcon,
 } from "lucide-react";
 
 import { useSession } from "next-auth/react";
@@ -92,7 +94,8 @@ export default function SideChatBar({
               } `}
           >
             {conversations.length > 0 ? (
-              conversations.map((conversation, index) => {
+              conversations.filter((c)=>c.messages.some((m)=>m.role ==='user'))
+              .map((conversation, index) => {
                 const firstUserMessage = conversation.messages.find(
                   (msg) => msg.role === "user"
                 );
@@ -102,12 +105,13 @@ export default function SideChatBar({
                     key={index}
                     hidden={!ShowChats}
                   >
-                    <div className="flex p-2 overflow-y-auto cursor-pointer justify-between items-center hover:bg-gray-800 rounded-lg ">
+                    <div className="flex p-1 gap-2  justify-start w-full  overflow-y-auto cursor-pointer items-center hover:bg-gray-900 rounded-lg ">
+                      <Dot size={50} className="text-orange-500 " />
                       <div
-                        className={`truncate flex justify-evenly cursor-pointer${Theme
+                        className={`truncate w-full flex  cursor-pointer${Theme
                           ? "bg-[#181818] text-gray-300 text-sm"
                           : "bg-white text-gray-800"
-                          } rounded-xl`}
+                          } rounded-lg`}
                         onClick={() => {
                           const convid = conversation.id;
                           if (convid) {
@@ -117,16 +121,14 @@ export default function SideChatBar({
                           }
                         }}
                       >
-                        <Dot className="text-orange-500"/>
-                        {firstUserMessage?.content ||
-                          "New Conversation"}
+
+                        {firstUserMessage?.content}
                       </div>
-                      <div className="flex items-center gap-5">
+                      <div className="flex items-center gap-2 hover:bg-gray-900">
                         <button onClick={() => setShowDelete(!ShowDelete)}>
-                          {/* <Ellipsis className="w-4" /> */}
+                          <Ellipsis className="w-4" />
                         </button>
-                      </div>
-                    </div>
+                      </div>          </div>
                   </div>
                 );
               })
@@ -150,7 +152,7 @@ export default function SideChatBar({
                   reset();
                   setisFooterOpen(!isFooterOpen);
                 }}
-                className="bg-gray-800  w-full flex 
+                className="bg-gray-900  w-full flex 
                         justify-start gap-3 p-2 rounded-lg text-sm hover:bg-gray-800"
               >
                 <LogOut className="w-8 h-5" />

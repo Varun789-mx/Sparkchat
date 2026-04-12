@@ -17,7 +17,8 @@ export const GetModelResponse = async (
           "Content-Type": `application/json`,
         },
         body: JSON.stringify({
-          model: model || "google/gemini-2.5-flash",
+          // model: model || "google/gemini-2.5-flash",
+          model: model,
           messages: [{ role: 'system', content: systemPrompt },
           ...messages
           ],
@@ -37,7 +38,7 @@ export const GetModelResponse = async (
       let tokenIteration = 0;
 
       while (true) {
-        tokenIteration++; { }
+        tokenIteration++;
         if (tokenIteration > MAX_TOKEN_ITERATONS) {
           console.log("Max token itterations");
           resolve();
@@ -59,7 +60,7 @@ export const GetModelResponse = async (
 
           if (line.startsWith('data: ')) {
             const data = line.slice(6);
-            if (data == '[DONE]') break;
+            if (!data || data == '[DONE]') break;
 
             try {
               const parsed = JSON.parse(data);
@@ -68,7 +69,7 @@ export const GetModelResponse = async (
                 cb(content);
               }
             } catch (e) {
-              console.log("Failed to parse SSE data", data, e);
+              continue;
             }
           }
         }

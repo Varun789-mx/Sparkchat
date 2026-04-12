@@ -7,7 +7,6 @@ import { signOut, useSession } from "next-auth/react";
 export const Chatlist = () => {
     const session = useSession();
     const [Executions, setExecutions] = useState<ExecutionType[] | []>([]);
-    const [show, setshow] = useState(false);
     const [showChats, setshowchats] = useState(true);
 
     useEffect(() => {

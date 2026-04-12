@@ -10,33 +10,6 @@ import { InMemoryStore } from "@/lib/InMemoryStore";
 import { GetModelResponse } from "@/lib/GetModelResponse";
 const genai = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API || "");
 
-const model = genai.getGenerativeModel({
-  model: "gemini-2.5-flash",
-  tools: [
-    {
-      codeExecution: {},
-    },
-  ],
-});
-
-// export async function POST(req: Request) {
-//   const { prompt } = await req.json();
-//   try {
-//     const result = await model.generateContent(prompt);
-
-//     return new Response(
-//       JSON.stringify({
-//         summary: result.response.text(),
-//       })
-//     );
-//   } catch (error: any) {
-//     return NextResponse.json(
-//       { message: error.message || "Something went wrong" },
-//       { status: 400 }
-//     );
-//   }
-// }
-
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
   const { conversationId, modelId, message } = await req.json();
@@ -49,14 +22,6 @@ export async function POST(req: Request) {
       { status: 400 }
     );
   }
-
-  const Selectedmodel = getModelById(modelId);
-  if (!Selectedmodel) {
-    return NextResponse.json({
-      Error: "Model not supported or not found",
-    });
-  }
-
   if (!session?.user.id) {
     return NextResponse.json(
       {
@@ -65,6 +30,15 @@ export async function POST(req: Request) {
       { status: 401 }
     );
   }
+
+  const Selectedmodel = getModelById(modelId);
+  if (!Selectedmodel) {
+    return NextResponse.json({
+      Error: "Model not supported or not found",
+    });
+  }
+
+
   const userid = session.user.id;
   const Getuser = await prisma.user.findUnique({
     where: {
@@ -131,11 +105,11 @@ export async function POST(req: Request) {
       }),
       !existingConversation
         ? prisma.conversation.create({
-            data: {
-              id: conversationId,
-              userId: session.user.id,
-            },
-          })
+          data: {
+            id: conversationId,
+            userId: session.user.id,
+          },
+        })
         : prisma.$executeRaw`SELECT 1`,
     ]);
   }
