@@ -8,10 +8,8 @@ import {
   LogOut,
   ChevronFirst,
   ChevronLast,
-  Dot,
   Ellipsis,
-  Delete,
-  Trash2,
+  Dot,
 } from "lucide-react";
 
 import { useSession } from "next-auth/react";
@@ -43,17 +41,15 @@ export default function SideChatBar({
     if (conversationId) setConversationId(conversationId);
     FetchConversations();
   }, [conversationId]);
+  console.log(session.data?.user.ispremium, "user status");
   return (
     <aside
-      className={`h-screen border-r border-gray-800 ${
-        SideBar ? "w-full md:w-60" : "w-0"
-      } `}
+      className={`h-screen border-r border-gray-800 ${SideBar ? "w-full md:w-60" : "w-0"
+        } `}
     >
       <nav
-        className={`h-full flex flex-col overflow-hidden border-gray-800 shadow-sm  ${
-          SideBar ? "w-full md:w-60" : "w-0"
-        } `}
-      >
+        className={`h-full flex flex-col overflow-hidden border-gray-800 shadow-sm  ${SideBar ? "w-full md:w-60" : "w-0"
+          } `}>
         <div className={`p-4 border-b border-gray-800  `}>
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-xl font-bold flex items-center gap-2">
@@ -92,9 +88,8 @@ export default function SideChatBar({
             Chats {ShowChats ? <ChevronDown /> : <ChevronRight />}
           </button>
           <div
-            className={`w-60 h-[80%] border border-gray-800 p-2 overflow-y-auto flex-1 space-y-2 pr-2 ${
-              Theme ? "bg-[#181818]" : "bg-white"
-            } `}
+            className={`w-60 h-[80%]  p-2 overflow-y-auto flex-1 space-y-2 pr-2 ${Theme ? "" : "bg-white"
+              } `}
           >
             {conversations.length > 0 ? (
               conversations.map((conversation, index) => {
@@ -103,17 +98,16 @@ export default function SideChatBar({
                 );
                 return (
                   <div
-                    className="w-full gap-2 p-1"
+                    className="w-full gap-1 p-1"
                     key={index}
                     hidden={!ShowChats}
                   >
-                    <div className="flex p-1 overflow-y-auto cursor-pointer justify-between items-center hover:bg-gray-700 rounded-lg ">
+                    <div className="flex p-2 overflow-y-auto cursor-pointer justify-between items-center hover:bg-gray-800 rounded-lg ">
                       <div
-                        className={`hover:bg-gray-700  cursor-pointer${
-                          Theme
-                            ? "bg-[#181818] text-gray-300 text-sm"
-                            : "bg-white text-gray-800"
-                        } rounded-xl`}
+                        className={`truncate flex justify-evenly cursor-pointer${Theme
+                          ? "bg-[#181818] text-gray-300 text-sm"
+                          : "bg-white text-gray-800"
+                          } rounded-xl`}
                         onClick={() => {
                           const convid = conversation.id;
                           if (convid) {
@@ -123,13 +117,13 @@ export default function SideChatBar({
                           }
                         }}
                       >
-                        {firstUserMessage?.content?.substring(0, 25) ||
+                        <Dot className="text-orange-500"/>
+                        {firstUserMessage?.content ||
                           "New Conversation"}
-                        ..
                       </div>
                       <div className="flex items-center gap-5">
                         <button onClick={() => setShowDelete(!ShowDelete)}>
-                          <Ellipsis className="w-4" />
+                          {/* <Ellipsis className="w-4" /> */}
                         </button>
                       </div>
                     </div>
@@ -156,8 +150,8 @@ export default function SideChatBar({
                   reset();
                   setisFooterOpen(!isFooterOpen);
                 }}
-                className="bg-gray-800  w-2/3 flex 
-                        justify-start gap-3 p-2 rounded-lg text-sm hover:bg-gray-700"
+                className="bg-gray-800  w-full flex 
+                        justify-start gap-3 p-2 rounded-lg text-sm hover:bg-gray-800"
               >
                 <LogOut className="w-8 h-5" />
                 Log out
@@ -165,7 +159,7 @@ export default function SideChatBar({
             </div>
             <button
               onClick={() => setisFooterOpen(!isFooterOpen)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-gray-800 transition-colors`}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg  transition-colors`}
             >
               <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-medium">
                 {session.data?.user.image ? (
@@ -185,8 +179,8 @@ export default function SideChatBar({
                 <div
                   className={`text-gray-300 text-xs w-full flex justify-start gap-4  `}
                 >
-                  {session.data?.user.ispremium ? (
-                    <p>Free Plan</p>
+                  {!session.data?.user.ispremium ? (
+                    <p>Standard Plan</p>
                   ) : (
                     <p>Premium Plan</p>
                   )}{" "}

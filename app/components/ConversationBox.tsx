@@ -79,7 +79,7 @@ export default function ConversationBox() {
                                                     </ReactMarkDown>
                                                 </div>
                                             )}
-                                            {msg.role === 'assistant' ?
+                                            {msg.role === 'assistant' && msg.content.length > 0 ?
                                                 <div className="flex justify-end"><button className="w-8 h-8 " onClick={() => HandleCopy(msg.content, msg.id)}>
                                                     {copiedId === msg.id ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}</button></div> : ""}
                                         </div>
