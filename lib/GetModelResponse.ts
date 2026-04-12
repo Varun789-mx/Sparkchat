@@ -17,7 +17,6 @@ export const GetModelResponse = async (
           "Content-Type": `application/json`,
         },
         body: JSON.stringify({
-          // model: model || "google/gemini-2.5-flash",
           model: model,
           messages: [{ role: 'system', content: systemPrompt },
           ...messages

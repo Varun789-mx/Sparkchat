@@ -1,19 +1,11 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {
-  ChevronDown,
-  ChevronRight,
-  ChevronUp,
   MessageSquare,
   Plus,
   LogOut,
   ChevronFirst,
-  ChevronLast,
   Ellipsis,
-  Dot,
-  Circle,
-  DotIcon,
 } from "lucide-react";
-
 import { useSession } from "next-auth/react";
 import { signOut } from "next-auth/react";
 import { useChatStore } from "@/hooks/useChatStore";
@@ -26,177 +18,147 @@ export default function SideChatBar({
   setSideBar: Dispatch<SetStateAction<boolean>>;
 }) {
   const session = useSession();
-  const Theme = true;
-  const [ShowDelete, setShowDelete] = useState(false);
+  const [showFooterMenu, setShowFooterMenu] = useState(false);
   const { setConversationId, conversationId } = useChatStore();
   const credits = useChatStore((state) => state.credits);
   const reset = useChatStore((state) => state.reset);
   const conversations = useChatStore((state) => state.conversations);
   const FetchConversations = useChatStore((state) => state.FetchConversations);
-  const loadingConversations = useChatStore(
-    (state) => state.loadingConversations
-  );
-  const [ShowChats, setShowChats] = useState(true);
-  const [isFooterOpen, setisFooterOpen] = useState(true);
+  const loadingConversations = useChatStore((state) => state.loadingConversations);
 
   useEffect(() => {
     if (conversationId) setConversationId(conversationId);
     FetchConversations();
   }, [conversationId]);
-  console.log(session.data?.user.ispremium, "user status");
+
   return (
     <aside
-      className={`h-screen border-r border-gray-800 ${SideBar ? "w-full md:w-60" : "w-0"
-        } `}
+      className={`h-screen shrink-0 transition-all duration-200 ${
+        SideBar ? "w-60" : "w-0"
+      }`}
     >
       <nav
-        className={`h-full flex flex-col overflow-hidden border-gray-800 shadow-sm  ${SideBar ? "w-full md:w-60" : "w-0"
-          } `}>
-        <div className={`p-4 border-b border-gray-800  `}>
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-xl font-bold flex items-center gap-2">
-              <MessageSquare className="w-6 h-6 text-orange-300" />
-              <span className="text-orange-300">Spark AI</span>
-            </h1>
+        className={`h-full flex flex-col bg-[#111111] border-r border-white/8 overflow-hidden ${
+          SideBar ? "w-60" : "w-0"
+        }`}
+      >
+        {/* Header */}
+        <div className="p-3 pb-3 border-b border-white/8">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2 text-orange-400">
+              <MessageSquare className="w-4 h-4" />
+              <span className="text-[15px] font-medium">Spark AI</span>
+            </div>
             <button
               onClick={() => setSideBar(!SideBar)}
-              className=" p-2 hover:bg-gray-700  text-white rounded-lg"
+              className="p-1.5 rounded-md text-white/40 hover:text-white/80 hover:bg-white/[0.07] transition-colors"
             >
-              {SideBar ? (
-                <ChevronFirst className="w-5 h-5" />
-              ) : (
-                <ChevronLast className="w-5 h-5" />
-              )}
+              <ChevronFirst className="w-4 h-4" />
             </button>
           </div>
           <button
-            className={`overflow-hidden w-50  duration-200  p-1.5 bg-orange-500 hover:bg-orange-700 text-white rounded-lg py-3 px-4 flex items-center justify-center gap-2 font-medium transition-colors  `}
-            onClick={() => {
-              reset();
-              FetchConversations();
-            }}
+            onClick={() => { reset(); FetchConversations(); }}
+            className="w-full bg-orange-500 hover:bg-orange-600 text-white text-[13px] font-medium rounded-lg py-2 px-3 flex items-center justify-center gap-1.5 transition-colors"
           >
-            <Plus className="w-5 h-5 overflow-hidden" />
-            New Chat
+            <Plus className="w-3.5 h-3.5" />
+            New chat
           </button>
         </div>
-        <div className={`flex-1 overflow-hidden p-2  duration-200 w-full`}>
-          <button
-            className="w-full text-gray-500 flex justify-start"
-            onClick={() => {
-              setShowChats(!ShowChats);
-            }}
-          >
-            Chats {ShowChats ? <ChevronDown /> : <ChevronRight />}
-          </button>
-          <div
-            className={`w-60 h-[80%]  p-2 overflow-y-auto flex-1 space-y-2 pr-2 ${Theme ? "" : "bg-white"
-              } `}
-          >
-            {conversations.length > 0 ? (
-              conversations.filter((c)=>c.messages.some((m)=>m.role ==='user'))
-              .map((conversation, index) => {
-                const firstUserMessage = conversation.messages.find(
-                  (msg) => msg.role === "user"
-                );
-                return (
-                  <div
-                    className="w-full gap-1 p-1"
-                    key={index}
-                    hidden={!ShowChats}
-                  >
-                    <div className="flex p-1 gap-2  justify-start w-full  overflow-y-auto cursor-pointer items-center hover:bg-gray-900 rounded-lg ">
-                      <Dot size={50} className="text-orange-500 " />
-                      <div
-                        className={`truncate w-full flex  cursor-pointer${Theme
-                          ? "bg-[#181818] text-gray-300 text-sm"
-                          : "bg-white text-gray-800"
-                          } rounded-lg`}
-                        onClick={() => {
-                          const convid = conversation.id;
-                          if (convid) {
-                            loadingConversations(convid);
-                          } else {
-                            console.log("No conversationId");
-                          }
-                        }}
-                      >
 
+        {/* Conversation list */}
+        <div className="flex-1 min-h-0 flex flex-col">
+          <p className="px-3 pt-3 pb-1 text-[11px] font-medium tracking-widest uppercase text-white/30">
+            Recent
+          </p>
+          <div className="flex-1 min-h-0 overflow-y-auto px-1.5 py-1 space-y-0.5 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+            {conversations.length > 0 ? (
+              conversations
+                .filter((c) => c.messages.some((m) => m.role === "user"))
+                .map((conversation, index) => {
+                  const firstUserMessage = conversation.messages.find(
+                    (msg) => msg.role === "user"
+                  );
+                  const isActive = conversation.id === conversationId;
+                  return (
+                    <div
+                      key={index}
+                      className={`group flex items-center gap-2 px-2 py-1.5 rounded-lg cursor-pointer transition-colors ${
+                        isActive
+                          ? "bg-orange-500/10 text-white/85"
+                          : "text-white/55 hover:bg-white/6"
+                      }`}
+                      onClick={() => {
+                        if (conversation.id) loadingConversations(conversation.id);
+                      }}
+                    >
+                      <div
+                        className={`w-1.5 h-1.5 rounded-full shrink-0 bg-orange-500 transition-opacity ${
+                          isActive ? "opacity-100" : "opacity-50"
+                        }`}
+                      />
+                      <span className="flex-1 text-[13px] truncate">
                         {firstUserMessage?.content}
-                      </div>
-                      <div className="flex items-center gap-2 hover:bg-gray-900">
-                        <button onClick={() => setShowDelete(!ShowDelete)}>
-                          <Ellipsis className="w-4" />
-                        </button>
-                      </div>          </div>
-                  </div>
-                );
-              })
+                      </span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                        }}
+                        className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-white/30 hover:text-white/60 hover:bg-white/8 transition-all shrink-0"
+                      >
+                        <Ellipsis className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  );
+                })
             ) : (
-              <p className="text-gray-500 text-center mt-4 ">
+              <p className="text-white/30 text-[13px] text-center mt-6">
                 No conversations yet
               </p>
             )}
           </div>
         </div>
 
-        <footer className={`overflow-hidden transition-all w-full`}>
-          <div className={`p-3 border-t border-gray-800 flex flex-col w-full `}>
-            <div
-              hidden={isFooterOpen}
-              className="flex justify-start  py-1 transition-all duration-200"
-            >
-              <button
-                onClick={() => {
-                  signOut();
-                  reset();
-                  setisFooterOpen(!isFooterOpen);
-                }}
-                className="bg-gray-900  w-full flex 
-                        justify-start gap-3 p-2 rounded-lg text-sm hover:bg-gray-800"
-              >
-                <LogOut className="w-8 h-5" />
-                Log out
-              </button>
-            </div>
+        {/* Footer */}
+        <div className="border-t border-white/8 p-2">
+          {showFooterMenu && (
             <button
-              onClick={() => setisFooterOpen(!isFooterOpen)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg  transition-colors`}
+              onClick={() => { signOut(); reset(); setShowFooterMenu(false); }}
+              className="w-full flex items-center gap-2 px-2 py-1.5 mb-1 rounded-lg text-[13px] text-white/40 hover:text-white/65 hover:bg-white/5 transition-colors"
             >
-              <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-medium">
-                {session.data?.user.image ? (
-                  <img
-                    className="rounded-full"
-                    src={session.data?.user.image}
-                    alt="user"
-                  />
-                ) : (
-                  session.data?.user.name?.charAt(0).toUpperCase()
-                )}
-              </div>
-              <div className="flex-1 text-left ">
-                <div className={`text-gray-200 font-medium text-sm`}>
-                  {session.data?.user.name?.replace("_", " ")}
-                </div>
-                <div
-                  className={`text-gray-300 text-xs w-full flex justify-start gap-4  `}
-                >
-                  {!session.data?.user.ispremium ? (
-                    <p>Standard Plan</p>
-                  ) : (
-                    <p>Premium Plan</p>
-                  )}{" "}
-                  <p>Credits:{credits.toString()}</p>
-                </div>
-              </div>
-              {isFooterOpen ? (
-                <ChevronDown className={`w-4 h-4 text-gray-500`} />
-              ) : (
-                <ChevronUp className={`w-4 h-4 text-gray-500`} />
-              )}
+              <LogOut className="w-3.5 h-3.5 shrink-0" />
+              Log out
             </button>
-          </div>
-        </footer>
+          )}
+          <button
+            onClick={() => setShowFooterMenu(!showFooterMenu)}
+            className="w-full flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-white/6 transition-colors"
+          >
+            <div className="w-7 h-7 rounded-full bg-blue-700 shrink-0 flex items-center justify-center text-[12px] font-medium text-blue-200 overflow-hidden">
+              {session.data?.user.image ? (
+                <img
+                  src={session.data.user.image}
+                  alt="user"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                session.data?.user.name?.charAt(0).toUpperCase()
+              )}
+            </div>
+            <div className="flex-1 text-left min-w-0">
+              <p className="text-[13px] font-medium text-white/85 truncate">
+                {session.data?.user.name?.replace("_", " ")}
+              </p>
+              <div className="flex items-center gap-2 mt-0.5">
+                <span className="text-[10px] font-medium bg-orange-500/15 text-orange-400 px-1.5 py-0.5 rounded">
+                  {session.data?.user.ispremium ? "Premium" : "Standard"}
+                </span>
+                <span className="text-[11px] text-white/35">
+                  {credits.toString()} credits
+                </span>
+              </div>
+            </div>
+          </button>
+        </div>
       </nav>
     </aside>
   );
