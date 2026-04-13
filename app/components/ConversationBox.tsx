@@ -91,6 +91,5 @@ export default function ConversationBox() {
                 )}
             </div>
         </div>
-
     )
 }

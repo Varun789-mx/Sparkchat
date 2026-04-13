@@ -5,10 +5,12 @@ import {
   LogOut,
   ChevronFirst,
   Ellipsis,
+  Trash2,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { signOut } from "next-auth/react";
 import { useChatStore } from "@/hooks/useChatStore";
+import toast from "react-hot-toast";
 
 export default function SideChatBar({
   SideBar,
@@ -19,6 +21,7 @@ export default function SideChatBar({
 }) {
   const session = useSession();
   const [showFooterMenu, setShowFooterMenu] = useState(false);
+  const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const { setConversationId, conversationId } = useChatStore();
   const credits = useChatStore((state) => state.credits);
   const reset = useChatStore((state) => state.reset);
@@ -31,16 +34,33 @@ export default function SideChatBar({
     FetchConversations();
   }, [conversationId]);
 
+  const DeleteConversation = async (conversationId:string ) => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/delete`
+        , {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            conversationId: conversationId,
+          })
+        });
+      const data = await response.json();
+      console.log(data);
+    } catch (error) {
+      toast.error("Error chat deletion failed")
+    }
+  }
   return (
     <aside
-      className={`h-screen shrink-0 transition-all duration-200 ${
-        SideBar ? "w-60" : "w-0"
-      }`}
+      className={`h-screen shrink-0 transition-all duration-200 ${SideBar ? "w-60" : "w-0"
+        }`}
     >
       <nav
-        className={`h-full flex flex-col bg-[#111111] border-r border-white/8 overflow-hidden ${
-          SideBar ? "w-60" : "w-0"
-        }`}
+        className={`h-full flex flex-col bg-[#111111] border-r border-white/8 overflow-hidden ${SideBar ? "w-60" : "w-0"
+          }`}
       >
         {/* Header */}
         <div className="p-3 pb-3 border-b border-white/8">
@@ -79,34 +99,49 @@ export default function SideChatBar({
                     (msg) => msg.role === "user"
                   );
                   const isActive = conversation.id === conversationId;
+                  const isMenuOpen = activeMenu === conversation.id;
                   return (
                     <div
                       key={index}
-                      className={`group flex items-center gap-2 px-2 py-1.5 rounded-lg cursor-pointer transition-colors ${
-                        isActive
+                      className={`group flex items-center gap-2 px-2 py-1.5 rounded-lg cursor-pointer transition-colors ${isActive
                           ? "bg-orange-500/10 text-white/85"
                           : "text-white/55 hover:bg-white/6"
-                      }`}
+                        }`}
                       onClick={() => {
                         if (conversation.id) loadingConversations(conversation.id);
+                        setActiveMenu(null);
                       }}
                     >
                       <div
-                        className={`w-1.5 h-1.5 rounded-full shrink-0 bg-orange-500 transition-opacity ${
-                          isActive ? "opacity-100" : "opacity-50"
-                        }`}
+                        className={`w-1.5 h-1.5 rounded-full shrink-0 bg-orange-500 transition-opacity ${isActive ? "opacity-100" : "opacity-50"
+                          }`}
                       />
                       <span className="flex-1 text-[13px] truncate">
                         {firstUserMessage?.content}
                       </span>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                        }}
-                        className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-white/30 hover:text-white/60 hover:bg-white/8 transition-all shrink-0"
-                      >
-                        <Ellipsis className="w-3.5 h-3.5" />
-                      </button>
+
+                      {isMenuOpen ? (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                             if (firstUserMessage?.id) DeleteConversation(firstUserMessage.id);
+                            setActiveMenu(null);
+                          }}
+                          className="p-0.5 rounded text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all shrink-0"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      ) : (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveMenu(conversation.id);
+                          }}
+                          className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-white/30 hover:text-white/60 hover:bg-white/8 transition-all shrink-0"
+                        >
+                          <Ellipsis className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                     </div>
                   );
                 })
@@ -117,6 +152,7 @@ export default function SideChatBar({
             )}
           </div>
         </div>
+
         {/* Footer */}
         <div className="border-t border-white/8 p-2">
           {showFooterMenu && (
