@@ -1,0 +1,301 @@
+   ▲ Next.js 16.0.7 (Turbopack)
+   - Local:         http://localhost:3000
+   - Network:       http://192.168.1.6:3000
+   - Environments: .env
+
+ ✓ Starting...
+ ✓ Ready in 2.4s
+ ○ Compiling /chat ...
+ GET /chat 200 in 6.4s (compile: 5.6s, proxy.ts: 242ms, render: 570ms)
+ GET /chat 200 in 342ms (compile: 58ms, proxy.ts: 131ms, render: 154ms)
+ POST /api/auth/_log 200 in 3.2s (compile: 3.0s, render: 212ms)
+ GET /api/auth/session 200 in 666ms (compile: 437ms, render: 229ms)
+ GET /api/credits 200 in 705ms (compile: 551ms, render: 154ms)
+ GET /api/sidebardata 200 in 749ms (compile: 619ms, render: 130ms)
+ GET /api/credits 200 in 57ms (compile: 14ms, render: 43ms)
+ GET /api/sidebardata 200 in 29ms (compile: 5ms, render: 24ms)
+ GET /chat 200 in 116ms (compile: 9ms, proxy.ts: 14ms, render: 94ms)
+ GET /api/sidebardata 200 in 54ms (compile: 8ms, render: 47ms)
+ GET /api/credits 200 in 59ms (compile: 21ms, render: 38ms)
+ GET /api/auth/session 200 in 78ms (compile: 33ms, render: 45ms)
+ GET /api/credits 200 in 41ms (compile: 15ms, render: 26ms)
+ GET /api/sidebardata 200 in 46ms (compile: 7ms, render: 39ms)
+ GET /api/sidebardata 200 in 44ms (compile: 5ms, render: 39ms)
+ GET /api/credits 200 in 31ms (compile: 8ms, render: 22ms)
+ GET /api/sidebardata 200 in 42ms (compile: 6ms, render: 36ms)
+ GET /api/credits 200 in 63ms (compile: 9ms, render: 53ms)
+[
+  {
+    id: '78847dc2-2658-48c6-849a-b65fad9c4ff1',
+    userId: '37898be3-968e-426f-8201-6ef8b4ba7cbc',
+    createdAt: 2026-04-16T18:03:20.647Z,
+    updatedAt: 2026-04-16T18:03:20.647Z
+  },
+  {
+    id: '4fe6cdad-9ecd-4e54-8c35-333cdb5385ff',
+    name: null,
+    description: null,
+    title: 'how many fingers do ...',
+    icon: null,
+    userId: '37898be3-968e-426f-8201-6ef8b4ba7cbc',
+    conversationId: '78847dc2-2658-48c6-849a-b65fad9c4ff1',
+    createdAt: 2026-04-16T18:03:20.647Z,
+    updatedAt: 2026-04-16T18:03:20.647Z
+  }
+] no need
+Max token itteraton 2
+Max token itteraton 2
+Max token itteraton 2
+ GET /api/credits 200 in 31ms (compile: 5ms, render: 26ms)
+Max token itteraton 2
+ GET /api/credits 200 in 22ms (compile: 4ms, render: 19ms)
+Max token itteraton 2
+ GET /api/credits 200 in 31ms (compile: 5ms, render: 25ms)
+Max token itteraton 2
+Max token itteraton 2
+ GET /api/credits 200 in 31ms (compile: 4ms, render: 27ms)
+ POST /api/chat 200 in 2.7s (compile: 819ms, render: 1872ms)
+ GET /api/auth/session 200 in 51ms (compile: 28ms, render: 23ms)
+ GET /api/auth/session 200 in 55ms (compile: 26ms, render: 29ms)
+ GET /api/auth/session 200 in 42ms (compile: 9ms, render: 33ms)
+ GET /api/auth/session 200 in 55ms (compile: 25ms, render: 30ms)
+ GET /api/auth/session 200 in 49ms (compile: 9ms, render: 40ms)
+ GET /api/auth/session 200 in 50ms (compile: 27ms, render: 23ms)
+ GET /api/auth/session 200 in 40ms (compile: 24ms, render: 16ms)
+ GET /api/auth/session 200 in 52ms (compile: 33ms, render: 19ms)
+ GET /api/auth/session 200 in 39ms (compile: 13ms, render: 26ms)
+ GET /chat 200 in 55ms (compile: 4ms, proxy.ts: 8ms, render: 43ms)
+ GET /api/auth/session 200 in 38ms (compile: 20ms, render: 18ms)
+ GET /api/sidebardata 200 in 73ms (compile: 5ms, render: 69ms)
+ GET /api/credits 200 in 78ms (compile: 4ms, render: 74ms)
+ GET /api/sidebardata 200 in 28ms (compile: 4ms, render: 24ms)
+ GET /api/credits 200 in 21ms (compile: 4ms, render: 17ms)
+ GET /api/auth/session 200 in 42ms (compile: 16ms, render: 27ms)
+ GET /api/auth/session 200 in 47ms (compile: 14ms, render: 33ms)
+ POST /api/delete 200 in 172ms (compile: 144ms, render: 28ms)
+ POST /api/delete 200 in 35ms (compile: 2ms, render: 33ms)
+ POST /api/delete 200 in 17ms (compile: 2ms, render: 15ms)
+ GET /api/conversations/2144dbbd-f9d3-4313-8c26-7566173e9b88 200 in 832ms (compile: 804ms, render: 29ms)
+ GET /api/credits 200 in 17ms (compile: 3ms, render: 14ms)
+ GET /api/sidebardata 200 in 19ms (compile: 7ms, render: 13ms)
+ GET /api/auth/session 200 in 36ms (compile: 19ms, render: 17ms)
+ GET /api/credits 200 in 10ms (compile: 1993µs, render: 8ms)
+ GET /api/sidebardata 200 in 20ms (compile: 2ms, render: 17ms)
+ GET /api/sidebardata 200 in 34ms (compile: 1678µs, render: 32ms)
+ ✓ Compiled in 60ms
+ GET /api/credits 200 in 15ms (compile: 5ms, render: 10ms)
+ GET /api/sidebardata 200 in 17ms (compile: 2ms, render: 15ms)
+ GET /api/auth/session 200 in 28ms (compile: 15ms, render: 13ms)
+ ✓ Compiled in 59ms
+ ✓ Compiled in 59ms
+ GET /api/auth/session 200 in 46ms (compile: 14ms, render: 32ms)
+ ✓ Compiled in 49ms
+ GET /api/auth/session 200 in 43ms (compile: 13ms, render: 30ms)
+ GET /api/auth/session 200 in 98ms (compile: 64ms, render: 33ms)
+ GET /api/auth/session 200 in 58ms (compile: 30ms, render: 28ms)
+ GET /api/auth/session 200 in 49ms (compile: 30ms, render: 20ms)
+ ✓ Compiled in 438ms
+ GET /api/auth/session 200 in 56ms (compile: 28ms, render: 28ms)
+ GET /api/credits 200 in 73ms (compile: 8ms, render: 65ms)
+[
+  {
+    id: '068d491d-ab57-40cd-a4d8-2ad54c33b97f',
+    userId: '37898be3-968e-426f-8201-6ef8b4ba7cbc',
+    createdAt: 2026-04-16T18:33:53.095Z,
+    updatedAt: 2026-04-16T18:33:53.095Z
+  },
+  {
+    id: '33678609-f1f7-416c-8e27-0edc0d498c8c',
+    name: null,
+    description: null,
+    title: ' MODELS.find((c)=>c....',
+    icon: null,
+    userId: '37898be3-968e-426f-8201-6ef8b4ba7cbc',
+    conversationId: '068d491d-ab57-40cd-a4d8-2ad54c33b97f',
+    createdAt: 2026-04-16T18:33:53.095Z,
+    updatedAt: 2026-04-16T18:33:53.095Z
+  }
+] no need
+Max token itteraton 2
+Max token itteraton 2
+Max token itteraton 2
+Max token itteraton 2
+ GET /api/credits 200 in 51ms (compile: 5ms, render: 46ms)
+ GET /api/credits 200 in 41ms (compile: 4ms, render: 37ms)
+Max token itteraton 2
+ GET /api/credits 200 in 32ms (compile: 5ms, render: 26ms)
+ GET /api/credits 200 in 34ms (compile: 5ms, render: 30ms)
+Max token itteraton 2
+ GET /api/credits 200 in 25ms (compile: 5ms, render: 20ms)
+Max token itteraton 2
+ GET /api/credits 200 in 46ms (compile: 5ms, render: 41ms)
+Max token itteraton 2
+ GET /api/credits 200 in 42ms (compile: 4ms, render: 38ms)
+Max token itteraton 2
+ GET /api/credits 200 in 50ms (compile: 5ms, render: 45ms)
+Max token itteraton 2
+Max token itteraton 2
+ GET /api/credits 200 in 23ms (compile: 5ms, render: 18ms)
+Max token itteraton 2
+ GET /api/credits 200 in 53ms (compile: 5ms, render: 48ms)
+Max token itteraton 2
+ GET /api/credits 200 in 47ms (compile: 5ms, render: 42ms)
+Max token itteraton 2
+ GET /api/credits 200 in 46ms (compile: 5ms, render: 41ms)
+Max token itteraton 2
+ GET /api/credits 200 in 38ms (compile: 4ms, render: 34ms)
+Max token itteraton 2
+ GET /api/credits 200 in 26ms (compile: 5ms, render: 21ms)
+Max token itteraton 2
+ GET /api/credits 200 in 65ms (compile: 6ms, render: 60ms)
+Max token itteraton 2
+ GET /api/credits 200 in 31ms (compile: 5ms, render: 26ms)
+Max token itteraton 2
+ GET /api/credits 200 in 31ms (compile: 4ms, render: 27ms)
+Max token itteraton 2
+ GET /api/credits 200 in 77ms (compile: 7ms, render: 70ms)
+Max token itteraton 2
+Max token itteraton 2
+Max token itteraton 2
+ POST /api/chat 200 in 6.1s (compile: 10ms, render: 6.0s)
+ GET /api/credits 200 in 72ms (compile: 4ms, render: 67ms)
+ GET /api/credits 200 in 27ms (compile: 4ms, render: 23ms)
+Max token itteraton 2
+Max token itteraton 2
+Max token itteraton 2
+ GET /api/credits 200 in 37ms (compile: 4ms, render: 33ms)
+Max token itteraton 2
+ GET /api/credits 200 in 48ms (compile: 5ms, render: 43ms)
+ GET /api/credits 200 in 51ms (compile: 4ms, render: 46ms)
+Max token itteraton 2
+ GET /api/credits 200 in 54ms (compile: 4ms, render: 50ms)
+Max token itteraton 2
+ GET /api/credits 200 in 39ms (compile: 4ms, render: 35ms)
+Max token itteraton 2
+ GET /api/credits 200 in 26ms (compile: 5ms, render: 20ms)
+Max token itteraton 2
+ GET /api/credits 200 in 50ms (compile: 5ms, render: 45ms)
+Max token itteraton 2
+ GET /api/credits 200 in 32ms (compile: 4ms, render: 28ms)
+Max token itteraton 2
+ GET /api/credits 200 in 25ms (compile: 6ms, render: 19ms)
+Max token itteraton 2
+Max token itteraton 2
+ GET /api/credits 200 in 48ms (compile: 12ms, render: 36ms)
+Max token itteraton 2
+ GET /api/credits 200 in 31ms (compile: 5ms, render: 26ms)
+Max token itteraton 2
+ GET /api/credits 200 in 28ms (compile: 4ms, render: 24ms)
+Max token itteraton 2
+ GET /api/credits 200 in 49ms (compile: 6ms, render: 43ms)
+Max token itteraton 2
+Max token itteraton 2
+ GET /api/credits 200 in 31ms (compile: 6ms, render: 24ms)
+Max token itteraton 2
+Max token itteraton 2
+Max token itteraton 2
+ GET /api/credits 200 in 23ms (compile: 5ms, render: 18ms)
+ GET /api/credits 200 in 34ms (compile: 4ms, render: 30ms)
+Max token itteraton 2
+ GET /api/credits 200 in 35ms (compile: 4ms, render: 30ms)
+Max token itteraton 2
+ GET /api/credits 200 in 33ms (compile: 4ms, render: 29ms)
+Max token itteraton 2
+Max token itteraton 2
+ GET /api/credits 200 in 50ms (compile: 5ms, render: 45ms)
+Max token itteraton 2
+Max token itteraton 2
+Max token itteraton 2
+Max token itteraton 2
+Max token itteraton 2
+ POST /api/chat 200 in 7.9s (compile: 6ms, render: 7.9s)
+ GET /api/credits 200 in 85ms (compile: 5ms, render: 81ms)
+ GET /api/credits 200 in 77ms (compile: 7ms, render: 70ms)
+ ✓ Compiled in 166ms
+ GET /api/auth/session 200 in 51ms (compile: 32ms, render: 19ms)
+ POST /api/chat 403 in 31ms (compile: 4ms, render: 27ms)
+ GET /api/credits 200 in 31ms (compile: 6ms, render: 25ms)
+ GET /api/sidebardata 200 in 45ms (compile: 7ms, render: 39ms)
+ GET /api/credits 200 in 53ms (compile: 4ms, render: 48ms)
+ GET /api/sidebardata 200 in 39ms (compile: 5ms, render: 35ms)
+ POST /api/chat 403 in 46ms (compile: 5ms, render: 42ms)
+ GET /api/credits 200 in 28ms (compile: 8ms, render: 20ms)
+ GET /api/auth/session 200 in 50ms (compile: 34ms, render: 15ms)
+ GET /api/auth/session 200 in 48ms (compile: 26ms, render: 22ms)
+ GET /api/auth/session 200 in 89ms (compile: 58ms, render: 32ms)
+ POST /api/chat 403 in 45ms (compile: 6ms, render: 39ms)
+ GET /api/credits 200 in 53ms (compile: 7ms, render: 46ms)
+ GET /api/auth/session 200 in 56ms (compile: 31ms, render: 26ms)
+ GET /api/sidebardata 200 in 55ms (compile: 5ms, render: 50ms)
+ GET /api/credits 200 in 39ms (compile: 7ms, render: 32ms)
+ GET /api/sidebardata 200 in 38ms (compile: 5ms, render: 32ms)
+ GET /api/auth/session 200 in 50ms (compile: 32ms, render: 18ms)
+ ✓ Compiled in 269ms
+ ✓ Compiled in 150ms
+ ○ Compiling /_error ...
+ GET /api/auth/session 500 in 7.3s (compile: 5.9s, render: 1391ms)
+ POST /api/auth/_log 500 in 64ms (compile: 39ms, render: 25ms)
+ GET /chat 200 in 1286ms (compile: 1130ms, proxy.ts: 14ms, render: 142ms)
+ ✓ Compiled in 125ms
+ GET /api/credits 200 in 81ms (compile: 7ms, render: 74ms)
+ GET /api/sidebardata 200 in 88ms (compile: 17ms, render: 71ms)
+ GET /api/sidebardata 200 in 42ms (compile: 6ms, render: 36ms)
+ GET /api/sidebardata 200 in 36ms (compile: 5ms, render: 32ms)
+ GET /api/credits 200 in 36ms (compile: 4ms, render: 32ms)
+ GET /api/sidebardata 200 in 29ms (compile: 5ms, render: 24ms)
+ GET /api/sidebardata 200 in 33ms (compile: 4ms, render: 29ms)
+ GET /api/credits 200 in 23ms (compile: 5ms, render: 18ms)
+ GET /api/sidebardata 200 in 51ms (compile: 5ms, render: 46ms)
+ GET /api/sidebardata 200 in 33ms (compile: 4ms, render: 29ms)
+ GET /api/credits 200 in 23ms (compile: 5ms, render: 18ms)
+ GET /api/sidebardata 200 in 27ms (compile: 4ms, render: 23ms)
+ POST /api/chat 403 in 68ms (compile: 35ms, render: 33ms)
+ GET /api/credits 200 in 27ms (compile: 5ms, render: 22ms)
+ ✓ Compiled in 135ms
+ GET /api/credits 200 in 33ms (compile: 19ms, render: 14ms)
+ GET /api/sidebardata 200 in 36ms (compile: 9ms, render: 28ms)
+ GET /chat 200 in 1932ms (compile: 265ms, proxy.ts: 21ms, render: 1646ms)
+ GET /api/sidebardata 200 in 97ms (compile: 8ms, render: 89ms)
+ GET /api/credits 200 in 97ms (compile: 19ms, render: 78ms)
+ GET /api/auth/session 200 in 74ms (compile: 49ms, render: 25ms)
+ GET /api/credits 200 in 54ms (compile: 19ms, render: 35ms)
+ GET /api/sidebardata 200 in 59ms (compile: 10ms, render: 48ms)
+ POST /api/chat 403 in 59ms (compile: 5ms, render: 54ms)
+ GET /api/credits 200 in 30ms (compile: 5ms, render: 25ms)
+ GET /api/auth/session 200 in 49ms (compile: 27ms, render: 22ms)
+ ✓ Compiled in 298ms
+ GET /api/auth/session 200 in 44ms (compile: 25ms, render: 19ms)
+ GET /api/credits 200 in 78ms (compile: 8ms, render: 70ms)
+[
+  {
+    id: '26fe0f49-3f17-4517-abbb-4dcd1d0a6545',
+    userId: '37898be3-968e-426f-8201-6ef8b4ba7cbc',
+    createdAt: 2026-04-16T19:03:09.466Z,
+    updatedAt: 2026-04-16T19:03:09.466Z
+  },
+  {
+    id: 'c362beec-cd44-47b0-90f4-b8d441739f1d',
+    name: null,
+    description: null,
+    title: 'suck...',
+    icon: null,
+    userId: '37898be3-968e-426f-8201-6ef8b4ba7cbc',
+    conversationId: '26fe0f49-3f17-4517-abbb-4dcd1d0a6545',
+    createdAt: 2026-04-16T19:03:09.466Z,
+    updatedAt: 2026-04-16T19:03:09.466Z
+  }
+] no need
+Max token itteraton 2
+Max token itteraton 2
+Max token itteraton 2
+Max token itteraton 2
+ GET /api/credits 200 in 49ms (compile: 5ms, render: 44ms)
+Max token itteraton 2
+ GET /api/credits 200 in 31ms (compile: 4ms, render: 27ms)
+Max token itteraton 2
+ GET /api/credits 200 in 51ms (compile: 7ms, render: 44ms)
+Max token itteraton 2
+ GET /api/credits 200 in 36ms (compile: 4ms, render: 33ms)
+Max token itteraton 2
+ POST /api/chat 200 in 2.2s (compile: 5ms, render: 2.1s)
+[?25h

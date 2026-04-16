@@ -19,10 +19,10 @@ export async function POST(req: Request) {
                 status: 400
             })
         }
-       await prisma.conversation.deleteMany({
+        await prisma.message.deleteMany({
             where: {
-                id: conversationId,
-                userId:session.user.id,
+                conversationId: conversationId,
+
             },
         })
         return Response.json({
@@ -31,6 +31,6 @@ export async function POST(req: Request) {
             status: 200
         })
     } catch (error) {
-        return Response.json({ error: "Failed to Delete the conversation "+error }, { status: 500 })
+        return Response.json({ error: "Failed to Delete the conversation " + error }, { status: 500 })
     }
 }

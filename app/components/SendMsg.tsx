@@ -1,7 +1,9 @@
 import { useChatStore } from "@/hooks/useChatStore";
-import { Send } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { useSession } from "next-auth/react";
+import { MODELS } from "@/models/constants";
+import { Send } from "lucide-react";
 
 export default function SendMessage({ isDarkMode }: {
     isDarkMode: boolean
@@ -10,6 +12,7 @@ export default function SendMessage({ isDarkMode }: {
     const setconversationId = useChatStore((state) => state.setConversationId);
     const conversationId = useChatStore((state) => state.conversationId);
     const { sendMessage, credits } = useChatStore();
+    const session = useSession();
     const [userinput, setuserinput] = useState({
         conversationId: "",
         modelId: "",
@@ -24,6 +27,7 @@ export default function SendMessage({ isDarkMode }: {
     };
     const Handlesend = async () => {
         if (!userinput.message.trim()) return;
+
         const model = localStorage.getItem("modelId") || "google/gemini-2.5-flash";
         setconversationId(localStorage.getItem("conversationId") || "");
         if (!conversationId) {
@@ -34,17 +38,23 @@ export default function SendMessage({ isDarkMode }: {
             modelId: model,
             conversationId: conversationId,
         }));
-        const currentMessage = userinput.message;
-        setuserinput({
-            modelId: model,
-            conversationId: conversationId,
-            message: "",
-        });
+
         if (credits <= 0) {
             toast.error("Insufficient Credits")
             return;
         }
+        if (!session.data?.user.ispremium && MODELS.find((c) => c.id === model)?.isPremium) {
+            toast.error("User is not premium")
+            console.log(model);
+            return;
+        }
         else {
+            const currentMessage = userinput.message;
+            setuserinput({
+                modelId: model,
+                conversationId: conversationId,
+                message: "",
+            });
             await sendMessage(currentMessage, model);
         }
     };
@@ -58,12 +68,12 @@ export default function SendMessage({ isDarkMode }: {
                 onKeyDown={Handlekeypress}
                 placeholder="Message SparkAi..."
                 rows={1}
-                className={`w-full  overflow-y-auto scroll-smooth crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 crollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 no-scrollbar-firefox-firefox-firefox-firefox-firefox-firefox-firefox-firefox ${isDarkMode ? "bg-gray-100":"bg-[#181818]"
-                    } border ${isDarkMode ? "border-gray-300": "border-gray-700" 
+                className={`w-full  overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900  no-scrollbar-firefox-firefox-firefox-firefox-firefox-firefox-firefox-firefox ${isDarkMode ? "bg-gray-100" : "bg-[#181818]"
+                    } border ${isDarkMode ? "border-gray-300" : "border-gray-700"
                     } ${isDarkMode
                         ? "focus:border-blue-400"
                         : "focus:border-blue-500"
-                    } rounded-xl px-4  py-3 pr-12 ${isDarkMode ?  "text-gray-200":"text-white"
+                    } rounded-xl px-4  py-3 pr-12 ${isDarkMode ? "text-gray-200" : "text-white"
                     } placeholder-gray-500 focus:outline-none resize-none transition-colors`}
                 style={
                     {
@@ -78,7 +88,7 @@ export default function SendMessage({ isDarkMode }: {
                 disabled={isLoading}
                 className={`absolute right-2 bottom-2 w-8 h-8 m-2 rounded-lg flex items-center align-middle justify-center transition-all ${!isLoading
                     ? "bg-orange-500 hover:bg-orange-700"
-                    : `${isDarkMode ? "bg-gray-100" :"bg-[#181818]" 
+                    : `${isDarkMode ? "bg-gray-100" : "bg-[#181818]"
                     } cursor-not-allowed`
                     }`}
             >

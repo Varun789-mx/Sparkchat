@@ -11,13 +11,9 @@ import SendMsg from "./SendMsg";
 
 export default function Navbar() {
   const chatcontainerRef = useRef<HTMLDivElement>(null);
-
-  const setconversationId = useChatStore((state) => state.setConversationId);
   const { messages } = useChatStore();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const isDarkMode = false;
-
-
 
   useEffect(() => {
     const container = chatcontainerRef.current;

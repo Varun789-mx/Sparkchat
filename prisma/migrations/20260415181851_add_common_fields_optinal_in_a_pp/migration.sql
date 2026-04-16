@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "App" ALTER COLUMN "description" DROP NOT NULL,
+ALTER COLUMN "icon" DROP NOT NULL;

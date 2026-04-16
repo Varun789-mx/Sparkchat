@@ -1,5 +1,4 @@
 "use server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/options";
@@ -8,7 +7,7 @@ import { getModelById, MODELS } from "@/models/constants";
 import { ROLE } from "@/types/general";
 import { InMemoryStore } from "@/lib/InMemoryStore";
 import { GetModelResponse } from "@/lib/GetModelResponse";
-const genai = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API || "");
+
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
@@ -72,37 +71,19 @@ export async function POST(req: Request) {
     );
   }
 
-  const execution = await prisma.execution.findFirst({
+  const conversation = await prisma.conversation.findFirst({
     where: {
       id: conversationId,
       userId: userid,
     },
   });
 
-  if (execution && execution.type !== "CONVERSATION") {
-    return NextResponse.json(
-      {
-        error: "Conversation exists but owner is differernt",
-      },
-      { status: 408 }
-    );
-  }
-
-  if (!execution) {
+  if (!conversation) {
     const existingConversation = await prisma.conversation.findUnique({
       where: { id: conversationId },
     });
 
-    await prisma.$transaction([
-      prisma.execution.create({
-        data: {
-          id: conversationId,
-          userId: Getuser.id,
-          title: message.slice(0, 20) + "...",
-          type: "CONVERSATION",
-          externalId: conversationId,
-        },
-      }),
+    const AddApp = await prisma.$transaction([
       !existingConversation
         ? prisma.conversation.create({
           data: {
@@ -111,7 +92,16 @@ export async function POST(req: Request) {
           },
         })
         : prisma.$executeRaw`SELECT 1`,
+      prisma.app.create({
+        data: {
+          userId: Getuser.id,
+          title: message.slice(0, 20) + "...",
+          conversationId: conversationId,
+        },
+      }),
     ]);
+
+    console.log(AddApp, "no need");
   }
 
   let existingMessages = InMemoryStore.getInstance().get(conversationId);
