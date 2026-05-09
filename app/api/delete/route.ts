@@ -22,7 +22,6 @@ export async function POST(req: Request) {
         await prisma.message.deleteMany({
             where: {
                 conversationId: conversationId,
-
             },
         })
         return Response.json({
