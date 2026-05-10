@@ -12,7 +12,7 @@ model User {
   id            String         @id @default(uuid())
   name          String
   email         String         @unique
-  credits       Int            @default(3)
+  credits       Int            @default(5)
   password      String?
   isPremium     Boolean        @default(false)
   createdAt     DateTime       @default(now())
